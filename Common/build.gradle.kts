@@ -1,0 +1,8 @@
+plugins {
+	id("org.springframework.boot")
+}
+
+dependencies {
+	compileOnly("org.springframework.boot:spring-boot-starter-web")
+    compileOnly("org.springframework.boot:spring-boot-starter-security")
+}

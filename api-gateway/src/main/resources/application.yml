@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: JwtAuthentication
+        - id: eureka
+          uri: http://localhost:8761
+          predicates:
+          - Path=/eureka/web
+          filters:
+          - SetPath=/
+        - id: eureka-static
+          uri: http://localhost:8761
+          predicates:
+          - Path=/eureka/** 
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+          - Path=/api/order/**
+        - id: product-service-get
+          uri: lb://product-service
+          predicates:
+          - Path=/api/product/**
+          - Method=GET
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+          - Path=/api/product/**
+          - Method=Post, PUT, DELETE
+          filters:
+          - name: JwtAuthentication
+            args:
+              requiredRole: ADMIN
+        - id: user-service-get
+          uri: lb://user-service
+          predicates:
+          - Path=/api/user/**
+          - Method=GET
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+          - Path=/user/product/**
+          - Method=Post, PUT, DELETE
+          filters:
+          - name: JwtAuthentication
+            args:
+              requiredRole: ADMIN
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+          - Path=/api/payment/**
+
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    root: TRACE

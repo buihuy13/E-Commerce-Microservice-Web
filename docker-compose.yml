@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  # Zookeeper: trình quản lý cho Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # Kafka Broker (máy chủ Kafka)
+  broker:
+    image: confluentinc/cp-kafka:7.3.2
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  db: 
+    image: "mysql:8.0"
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./main.sql:/docker-entrypoint-initdb.d/main.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "db", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  service-discovery:
+    build:
+      context: .
+      dockerfile: ./service-discovery/Dockerfile
+    ports:
+      - "8761:8761"
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRETKEY=${JWT_SECRETKEY}
+    depends_on:
+      - service-discovery
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - JWT_SECRETKEY=${JWT_SECRETKEY}
+    depends_on:
+      - service-discovery
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - USER_SERVICE_DB_URL=${USER_SERVICE_DB_URL}
+      - USER_SERVICE_DB_USER=${USER_SERVICE_DB_USER}
+      - USER_SERVICE_DB_PASS=${USER_SERVICE_DB_PASS}
+      - USER_SERVICE_DB_NAME=${USER_SERVICE_DB_NAME}
+    depends_on:
+      - db
+      - service-discovery
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      - service-discovery
+  product-service:
+    build:
+      context: .
+      dockerfile: ./product-service/Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - PRODUCT_SERVICE_DB_URL=${PRODUCT_SERVICE_DB_URL}
+      - PRODUCT_SERVICE_DB_USER=${PRODUCT_SERVICE_DB_USER}
+      - PRODUCT_SERVICE_DB_PASS=${PRODUCT_SERVICE_DB_PASS}
+      - PRODUCT_SERVICE_DB_NAME=${PRODUCT_SERVICE_DB_NAME}
+    depends_on:
+      - db
+      - service-discovery
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      - ORDER_SERVICE_DB_URL=${ORDER_SERVICE_DB_URL}
+      - ORDER_SERVICE_DB_USER=${ORDER_SERVICE_DB_USER}
+      - ORDER_SERVICE_DB_PASS=${ORDER_SERVICE_DB_PASS}
+      - ORDER_SERVICE_DB_NAME=${ORDER_SERVICE_DB_NAME}
+    depends_on:
+      - db
+      - service-discovery
+  payment-service:
+    build:
+      context: .
+      dockerfile: ./payment-service/Dockerfile
+    ports:
+      - "8086:8086"
+    environment:
+      - VNPAY_TMN_CODE=${VNPAY_TMN_CODE}
+      - VNPAY_HASH_SECRET=${VNPAY_HASH_SECRET}
+      - VNPAY_URL=${VNPAY_URL}
+      - VNPAY_RETURN_URL=${VNPAY_RETURN_URL}
+      - VNPAY_IPN_URL=${VNPAY_IPN_URL}
+    depends_on:
+      - service-discovery
+
+volumes:
+  mysql_data:
