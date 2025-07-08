@@ -49,13 +49,17 @@ public class ProductDetailsService {
                                                     .color(productDetailsDTO.getColor())
                                                     .product(product)
                                                     .quantity(productDetailsDTO.getQuantity())
-                                                    .imageName(imageFile.getOriginalFilename())
-                                                    .imageType(imageFile.getContentType())
-                                                    .imageData(imageFile.getBytes())
                                                     .build();
 
-        return productDetails;
+        if (imageFile != null)
+        {
+            productDetails.setImageName(imageFile.getOriginalFilename());
+            productDetails.setImageType(imageFile.getContentType());
+            productDetails.setImageData(imageFile.getBytes());
+        }
+        productDetailsRepository.save(productDetails);
 
+        return productDetails;
     }
 
     @Transactional

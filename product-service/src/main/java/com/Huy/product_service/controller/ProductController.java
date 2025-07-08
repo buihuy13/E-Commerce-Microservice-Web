@@ -46,7 +46,6 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody @Valid CreateProductDTO productDTO)
     {
         Product product = productService.createProduct(productDTO);
-
         return new ResponseEntity<>(product, HttpStatusCode.valueOf(201));
     }
 

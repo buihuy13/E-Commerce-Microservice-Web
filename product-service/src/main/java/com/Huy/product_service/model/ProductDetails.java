@@ -31,18 +31,19 @@ public class ProductDetails {
     private Integer id;
     @NotBlank(message = "Color cannot be blank")
     private String color;
-    @Column(name = "iamgeName")
+    @Column(name = "imagename")
     private String imageName;
-    @Column(name = "imageType")
+    @Column(name = "imagetype")
     private String imageType;
     
-    @Column(name = "imageData")
+    @Column(name = "imagedata")
     @Lob
     private byte[] imageData;
 
     @Min(0)
     private Integer quantity;
 
+    @Getter(lombok.AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;

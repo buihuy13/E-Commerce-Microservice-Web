@@ -16,10 +16,10 @@ body {
 </head>
 <body>
 	<p>Hello, <strong><span th:text="${name}"></span></strong>!!!</p>
-	<p th:if="${success == 1}">Ordered Successfully</p>
-	<p th:if="{success == 0}">Ordered Failed</p>
+	<p th:if="${success == true}">Ordered Successfully</p>
+	<p th:if="${success == false}">Ordered Failed</p>
 	<p>
-		<strong>Thanks,</strong> <br />
+		<strong>Thank you</strong> <br />
 		<span th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}"></span>
 	</p>
 </body>

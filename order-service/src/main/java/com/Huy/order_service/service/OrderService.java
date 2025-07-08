@@ -5,9 +5,6 @@ import java.security.SecureRandom;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -45,8 +42,6 @@ public class OrderService {
 
     private static final String Cart_Key = "CART";
 
-    private final Map<String, Map<Integer, CartItem>> reservations = new ConcurrentHashMap<>();
-
     private final String CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
 
     private String generateRandomId(int length) {
@@ -70,17 +65,7 @@ public class OrderService {
         return cart;
     }
 
-    public int getTotalReservedQuantity(int productId) {
-        return reservations.values().stream()
-                .flatMap(userReservations -> userReservations.values().stream()) // Chuyển thành một stream Cart Model
-                .filter(r -> r.getProductDetailsId() == productId)
-                .mapToInt(CartItem::getQuantity) // Lấy số lượng
-                .sum();
-    }
-
-    // synchronized tránh race condition (thread A làm xong thì thread B mới được
-    // vào) (thread A giữ tài nguyên)
-    public synchronized void addToCart(CartModel cart, HttpSession session)
+    public void addToCart(CartModel cart, HttpSession session)
             throws SQLIntegrityConstraintViolationException {
         try {
             int productDetailsId = cart.getProductDetailsId();
@@ -92,17 +77,13 @@ public class OrderService {
                     .bodyToMono(Integer.class)
                     .block();
 
-            int totalReserved = getTotalReservedQuantity(productDetailsId);
-            if (currentStock - totalReserved > quantity) {
-                String sessionId = session.getId();
+            if (currentStock > quantity) {
                 CartItem newReservation = new CartItem(quantity, productDetailsId);
 
                 List<CartItem> list = getCartFromSession(session);
                 list.add(newReservation);
                 session.setAttribute(Cart_Key, list);
 
-                reservations.computeIfAbsent(sessionId, k -> new ConcurrentHashMap<>()).put(productDetailsId,
-                        newReservation);
             } else {
                 throw new SQLIntegrityConstraintViolationException(
                         "Không còn đủ số lượng cho productId: " + productDetailsId);
@@ -122,15 +103,12 @@ public class OrderService {
      * Xóa đặt chỗ khi người dùng tự xóa khỏi giỏ hàng.
      */
     public void removeFromCart(HttpSession session, Integer productId) {
-        String sessionId = session.getId();
-        Map<Integer, CartItem> userReservations = reservations.get(sessionId);
-        if (userReservations != null) {
-            List<CartItem> list = getCartFromSession(session);
-            CartItem cartModel = userReservations.get(productId);
-            list.remove(cartModel);
-            session.setAttribute(Cart_Key, list);
-            userReservations.remove(productId);
-        }
+        List<CartItem> list = getCartFromSession(session);
+        CartItem cartModel = list.stream().filter(p -> p.getProductDetailsId() == productId)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm trong giỏ hàng"));
+        list.remove(cartModel);
+        session.setAttribute(Cart_Key, list);
     }
 
     @Transactional
@@ -156,7 +134,6 @@ public class OrderService {
                 .bodyToMono(String.class)
                 .block();
 
-        reservations.remove(session.getId());
         session.removeAttribute(Cart_Key);
         // gọi đến payment url để banking
         return url;
@@ -172,6 +149,18 @@ public class OrderService {
                                     .stream()
                                     .map(cart -> new com.Huy.Common.Event.CartModel(cart.getProductDetailsId(), cart.getQuantity()))
                                     .toList();
+        order.setStatus(BankingStatus.SUCCESS.toString());
+        orderRepository.save(order);
         kafkaTemplate.send("productTopic", new ProductEvent(carts));
     }
+
+    @KafkaListener(topics = "orderTopicFailed")
+    public void handleAfterPaymentFailed(OrderEvent orderEvent) {
+        String orderId = orderEvent.getId();
+        Order order = orderRepository.findById(orderId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy order với id: " + orderId));
+        order.setStatus(BankingStatus.FAILED.toString());
+        orderRepository.save(order);
+    }
 }
+

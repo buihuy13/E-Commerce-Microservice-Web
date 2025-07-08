@@ -37,7 +37,7 @@ public class Product {
     private BigDecimal price;
     @NotBlank(message = "Category cannot be blank")
     private String category;
-    @Column(name = "releaseDate")
+    @Column(name = "release_date")
     private Date releaseDate;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -2,7 +2,7 @@ package com.Huy.notification_service.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +19,7 @@ public class NotificationController {
 		this.emailService = emailService;
 	}
 
-	@GetMapping
+	@PostMapping
 	public ResponseEntity<String> sendEmail(@RequestBody com.Huy.notification_service.model.RequestBody requestBody) {
 		emailService.sendEmail(requestBody);
 		return new ResponseEntity<>("Gửi mail thành công", HttpStatus.OK);

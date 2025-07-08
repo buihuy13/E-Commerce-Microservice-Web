@@ -11,6 +11,10 @@ create table users(
  `role` varchar(10) not null
  );
 
+ insert into users(id, `password`, username, email, phone, address, `role`) values 
+("testadminid", "$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testadmin", "testadmin@gmail.com", "0762612698", "TPHCM", "ADMIN"),
+("testuserid", "$2a$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testuser", "testuser@gmail.com", "0762612699", "TP Vinh, Nghe An", "USER");
+
 
 create database if not exists `order-service`;
 use `order-service`;
@@ -27,8 +31,8 @@ create table cart(
  `orderid` varchar(255) references `order`(id)
 );
 
-create database if not exists `product-service`
-use `product-service`
+create database if not exists `product-service`;
+use `product-service`;
 
 create table products (
     `id` varchar(255) primary key,
@@ -36,15 +40,15 @@ create table products (
     `description` varchar(255), 
     `price` decimal not null,
     `category` varchar(50) not null,
-    `releaseDate` date
-)
+    `release_date` date
+);
 
 create table product_details (
     `id` int primary key auto_increment,
     `color` varchar(30) not null,
     `imagename` varchar(255),
     `imagetype` varchar(100),
-    `imagedata` blob,
+    `imagedata` longblob,
     `quantity` int not null,
-    `product_id` varchar(255) references `products`(`id`)
-)
+    `product_id` varchar(255) not null references `products`(`id`)
+);

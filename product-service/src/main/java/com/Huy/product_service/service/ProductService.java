@@ -38,6 +38,7 @@ public class ProductService {
     public Product createProduct(CreateProductDTO productDTO)
     {
         Product product = Utils.mapCreateProductDTOtoProduct(productDTO);
+        productRepository.save(product);
         return product;
     }
 

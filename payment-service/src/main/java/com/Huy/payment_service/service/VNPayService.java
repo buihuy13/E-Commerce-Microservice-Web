@@ -156,6 +156,7 @@ public class VNPayService {
         } else {
             // Giao dịch thất bại
             // Xử lý đối với giao dịch fail
+            kafkaTemplate.send("orderTopicFailed", new OrderEvent(orderId));
             kafkaTemplate.send("NotificationTopic", new NotificationEvent(email, false));
         }
     }

@@ -33,7 +33,7 @@ spring:
           uri: lb://product-service
           predicates:
           - Path=/api/product/**
-          - Method=Post, PUT, DELETE
+          - Method=POST, PUT, DELETE
           filters:
           - name: JwtAuthentication
             args:
@@ -41,12 +41,12 @@ spring:
         - id: user-service-get
           uri: lb://user-service
           predicates:
-          - Path=/api/user/**
+          - Path=/api/users/**
           - Method=GET
         - id: user-service
           uri: lb://user-service
           predicates:
-          - Path=/user/product/**
+          - Path=/api/users/**
           - Method=Post, PUT, DELETE
           filters:
           - name: JwtAuthentication
@@ -56,6 +56,10 @@ spring:
           uri: lb://payment-service
           predicates:
           - Path=/api/payment/**
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+          - Path=/notification/**
 
 
 server:

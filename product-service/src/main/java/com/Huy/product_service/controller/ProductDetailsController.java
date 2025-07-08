@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.Huy.product_service.dto.request.CreateProductDetailsDTO;
 import com.Huy.product_service.dto.response.MessageResponse;
+import com.Huy.product_service.dto.response.Quantity;
 import com.Huy.product_service.model.ProductDetails;
 import com.Huy.product_service.service.ProductDetailsService;
 
@@ -44,17 +45,17 @@ public class ProductDetailsController {
     }
 
     @PostMapping()
-    public ResponseEntity<ProductDetails> createProduct(@RequestPart("product") @Valid CreateProductDetailsDTO productDTO,
-                                                        @RequestPart("imageFile") MultipartFile imageFile) throws IOException
+    public ResponseEntity<ProductDetails> createProduct(@RequestPart(value = "product", required = true) @Valid CreateProductDetailsDTO productDTO,
+                                                        @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException
     {
         ProductDetails product = productDetailsService.createProductDetails(productDTO, imageFile);
-
         return new ResponseEntity<>(product, HttpStatusCode.valueOf(201));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDetails> updateProduct(@PathVariable int id, 
-                    @RequestPart("product") @Valid CreateProductDetailsDTO productDTO, @RequestPart("imageFile") MultipartFile imageFile) throws IOException
+                    @RequestPart(value = "product", required = true) @Valid CreateProductDetailsDTO productDTO, 
+                    @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException
     {
         ProductDetails product = productDetailsService.updateProductDetails(id, productDTO, imageFile);
         return ResponseEntity.ok(product);
@@ -68,9 +69,9 @@ public class ProductDetailsController {
     }
 
     @GetMapping("/{id}/quantity")
-    public ResponseEntity<Integer> getQuantity(@PathVariable int id)
+    public ResponseEntity<Quantity> getQuantity(@PathVariable int id)
     {
         ProductDetails productDetails = productDetailsService.getProductDetailsById(id);
-        return ResponseEntity.ok(productDetails.getQuantity());
+        return ResponseEntity.ok(new Quantity(productDetails.getQuantity()));
     } 
 }

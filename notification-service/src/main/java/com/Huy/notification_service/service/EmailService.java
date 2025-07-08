@@ -34,12 +34,13 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String username;
 
-    @KafkaListener(topics = "notificationTopic")
+    //@KafkaListener(topics = "notificationTopic")
     public void sendEmail(RequestBody request) {
         log.info("Sending emails...");
         try {
             Context context = new Context();
             Map<String, Object> map = new HashMap<>();
+            map.put("name", request.getEmail());
             map.put("success", request.isSuccess());
             context.setVariables(map);
             String process = springTemplateEngine.process("welcome", context);
