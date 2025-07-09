@@ -94,6 +94,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(BadPaymentRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadPaymentRequestException(BadPaymentRequestException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            "BAD_PAYMENT_REQUEST", 
+            ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     // Xử lý exception chung
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {

@@ -1,4 +1,4 @@
-package com.Huy.order_service.model;
+package com.Huy.order_service.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,6 +35,7 @@ public class CartModel {
     @NotNull
     private int productDetailsId;
 
+    @Getter(lombok.AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;

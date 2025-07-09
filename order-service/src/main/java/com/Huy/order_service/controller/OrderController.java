@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.Huy.order_service.model.CartModel;
 import com.Huy.order_service.model.MessageResponse;
 import com.Huy.order_service.model.OrderRequest;
+import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.service.OrderService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

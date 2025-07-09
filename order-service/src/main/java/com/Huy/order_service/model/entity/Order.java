@@ -1,4 +1,4 @@
-package com.Huy.order_service.model;
+package com.Huy.order_service.model.entity;
 
 import java.util.List;
 
