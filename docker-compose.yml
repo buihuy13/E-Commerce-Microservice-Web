@@ -54,6 +54,7 @@ services:
     environment:
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_HOST_NAME=service-discovery
+      - PORT=8761
 
   zipkin:
     image: openzipkin/zipkin
@@ -70,6 +71,9 @@ services:
     environment:
       - JWT_SECRETKEY=${JWT_SECRETKEY}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - EUREKA_SERVER_URI=http://service-discovery:8761
+      - PORT=8080
     depends_on:
       - service-discovery
   auth-service:
@@ -84,6 +88,7 @@ services:
       - JWT_SECRETKEY=${JWT_SECRETKEY}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8081
     depends_on:
       - service-discovery
   user-service:
@@ -101,6 +106,7 @@ services:
       - USER_SERVICE_DB_NAME=${USER_SERVICE_DB_NAME}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8082
     depends_on:
       db:
         condition: service_healthy
@@ -117,6 +123,7 @@ services:
     environment:
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8083
     depends_on:
       - service-discovery
   product-service:
@@ -134,6 +141,7 @@ services:
       - PRODUCT_SERVICE_DB_NAME=${PRODUCT_SERVICE_DB_NAME}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8084
     depends_on:
       db:
         condition: service_healthy
@@ -154,6 +162,7 @@ services:
       - ORDER_SERVICE_DB_NAME=${ORDER_SERVICE_DB_NAME}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8085
     depends_on:
       db:
         condition: service_healthy
@@ -175,6 +184,7 @@ services:
       - VNPAY_IPN_URL=${VNPAY_IPN_URL}
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - PORT=8086
     depends_on:
       - service-discovery
 
