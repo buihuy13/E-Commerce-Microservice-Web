@@ -3,6 +3,10 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: auth-service
           uri: lb://auth-service
@@ -11,13 +15,13 @@ spring:
           filters:
             - name: JwtAuthentication
         - id: eureka
-          uri: http://localhost:8761
+          uri: http://service-discovery:8761
           predicates:
           - Path=/eureka/web
           filters:
           - SetPath=/
         - id: eureka-static
-          uri: http://localhost:8761
+          uri: http://service-discovery:8761
           predicates:
           - Path=/eureka/** 
         - id: order-service
@@ -68,7 +72,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://service-discovery:8761/eureka/
 
 logging:
   level:

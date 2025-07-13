@@ -17,7 +17,4 @@ public class LoginDTO {
     private String email;
     @NotBlank(message = "Password is mandatory")
     private String password;
-    // FE luôn thêm role user, chỉ với tài khoản testadmin@gmail.com mới thêm role admin
-    @NotBlank
-    private String role;
 }

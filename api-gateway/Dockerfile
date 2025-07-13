@@ -15,7 +15,8 @@ RUN ./gradlew bootJar --no-daemon -x test
 #Stage 2: Final
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar application.jar
+ARG MODULE_PATH
+COPY --from=builder /app/${MODULE_PATH}/build/libs/*.jar application.jar
 EXPOSE 8080
 
 # Lệnh để khởi động ứng dụng khi container chạy

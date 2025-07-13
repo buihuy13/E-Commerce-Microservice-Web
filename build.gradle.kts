@@ -1,29 +1,31 @@
 plugins {
-    id ("java")
+    id("java")
     id("org.springframework.boot") version "3.5.0" apply false // Đổi phiên bản mới hơn nếu muốn, ví dụ 3.3.0
     id("io.spring.dependency-management") version "1.1.7" apply false 
 } 
 
 // các project, bao gồm cả project gốc.
 allprojects {
-    group = "com.Huy"
-    version = "0.0.1-SNAPSHOT"
-
-    repositories {
-        mavenCentral()
-    }
-}
-
-subprojects {
     apply(plugin = "java")
-    // Áp dụng plugin quản lý dependency của Spring cho các module con
-    apply(plugin = "io.spring.dependency-management")
 
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
     }
+
+    group = "com.Huy"
+    version = "0.0.1-SNAPSHOT"
+
+    repositories {
+        mavenCentral()  
+    }
+}
+
+subprojects {
+    // Áp dụng plugin quản lý dependency của Spring cho các module con
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "org.springframework.boot")
 
     configurations {
 	    compileOnly {

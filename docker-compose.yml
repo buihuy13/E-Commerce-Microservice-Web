@@ -42,12 +42,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 60s
   service-discovery:
     build:
       context: .
       dockerfile: ./service-discovery/Dockerfile
+      args:
+        MODULE_PATH: service-discovery
     ports:
       - "8761:8761"
+    environment:
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_HOST_NAME=service-discovery
 
   zipkin:
     image: openzipkin/zipkin
@@ -57,26 +63,35 @@ services:
     build:
       context: .
       dockerfile: ./api-gateway/Dockerfile
+      args:
+        MODULE_PATH: api-gateway
     ports:
       - "8080:8080"
     environment:
       - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
     depends_on:
       - service-discovery
   auth-service:
     build:
       context: .
       dockerfile: ./auth-service/Dockerfile
+      args:
+        MODULE_PATH: auth-service
     ports:
       - "8081:8081"
     environment:
       - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
       - service-discovery
   user-service:
     build:
       context: .
       dockerfile: ./user-service/Dockerfile
+      args:
+        MODULE_PATH: user-service
     ports:
       - "8082:8082"
     environment:
@@ -84,21 +99,32 @@ services:
       - USER_SERVICE_DB_USER=${USER_SERVICE_DB_USER}
       - USER_SERVICE_DB_PASS=${USER_SERVICE_DB_PASS}
       - USER_SERVICE_DB_NAME=${USER_SERVICE_DB_NAME}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
-      - db
-      - service-discovery
+      db:
+        condition: service_healthy
+      service-discovery:
+        condition: service_started
   notification-service:
     build:
       context: .
       dockerfile: ./notification-service/Dockerfile
+      args:
+        MODULE_PATH: notification-service
     ports:
       - "8083:8083"
+    environment:
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
       - service-discovery
   product-service:
     build:
       context: .
       dockerfile: ./product-service/Dockerfile
+      args:
+        MODULE_PATH: product-service
     ports:
       - "8084:8084"
     environment:
@@ -106,13 +132,19 @@ services:
       - PRODUCT_SERVICE_DB_USER=${PRODUCT_SERVICE_DB_USER}
       - PRODUCT_SERVICE_DB_PASS=${PRODUCT_SERVICE_DB_PASS}
       - PRODUCT_SERVICE_DB_NAME=${PRODUCT_SERVICE_DB_NAME}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
-      - db
-      - service-discovery
+      db:
+        condition: service_healthy
+      service-discovery:
+        condition: service_started
   order-service:
     build:
       context: .
       dockerfile: ./order-service/Dockerfile
+      args:
+        MODULE_PATH: order-service
     ports:
       - "8085:8085"
     environment:
@@ -120,13 +152,19 @@ services:
       - ORDER_SERVICE_DB_USER=${ORDER_SERVICE_DB_USER}
       - ORDER_SERVICE_DB_PASS=${ORDER_SERVICE_DB_PASS}
       - ORDER_SERVICE_DB_NAME=${ORDER_SERVICE_DB_NAME}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
-      - db
-      - service-discovery
+      db:
+        condition: service_healthy
+      service-discovery:
+        condition: service_started
   payment-service:
     build:
       context: .
       dockerfile: ./payment-service/Dockerfile
+      args:
+        MODULE_PATH: payment-service
     ports:
       - "8086:8086"
     environment:
@@ -135,6 +173,8 @@ services:
       - VNPAY_URL=${VNPAY_URL}
       - VNPAY_RETURN_URL=${VNPAY_RETURN_URL}
       - VNPAY_IPN_URL=${VNPAY_IPN_URL}
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
     depends_on:
       - service-discovery
 

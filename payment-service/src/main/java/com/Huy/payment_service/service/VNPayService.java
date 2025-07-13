@@ -32,7 +32,6 @@ public class VNPayService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-
     @Value("${vnpay.tmn_code}")
     private String vnpay_tmncode;
 
@@ -150,7 +149,7 @@ public class VNPayService {
             // Giao dịch thất bại
             // Xử lý đối với giao dịch fail
             kafkaTemplate.send("orderTopicFailed", new OrderEvent(orderId));
-            kafkaTemplate.send("NotificationTopic", new NotificationEvent(email, false));
+            kafkaTemplate.send("notificationTopic", new NotificationEvent(email, false));
         }
     }
 

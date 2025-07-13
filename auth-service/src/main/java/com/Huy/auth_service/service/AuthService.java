@@ -61,7 +61,11 @@ public class AuthService {
     public TokenResponse login(LoginDTO model) {
         @SuppressWarnings("unused")
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(model.getEmail(), model.getPassword()));
-        return new TokenResponse(jwtService.generateToken(model.getEmail(), model.getRole()), jwtService.generateRefreshToken(model.getEmail(), model.getRole()));
+        String role = authentication.getAuthorities().stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"))
+                .getAuthority();
+        return new TokenResponse(jwtService.generateToken(model.getEmail(), role), jwtService.generateRefreshToken(model.getEmail(), role));
     }
 
     public String refreshAccessToken(String refToken) throws Exception {

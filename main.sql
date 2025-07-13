@@ -11,8 +11,8 @@ create table users(
  `role` varchar(10) not null
  );
 
- insert into users(id, `password`, username, email, phone, address, `role`) values 
-("testadminid", "$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testadmin", "testadmin@gmail.com", "0762612698", "TPHCM", "ADMIN"),
+insert into users(id, `password`, username, email, phone, address, `role`) values 
+("testadminid", "$2a$12$xv4.GmxuJeUUs54wJNwPdODdcvnHs7ikvpCuLeVVMy4tki5hZLq/m", "testadmin", "testadmin@gmail.com", "0762612698", "TPHCM", "ADMIN"),
 ("testuserid", "$2a$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testuser", "testuser@gmail.com", "0762612699", "TP Vinh, Nghe An", "USER");
 
 

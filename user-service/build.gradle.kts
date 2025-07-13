@@ -1,6 +1,3 @@
-plugins {
-	id("org.springframework.boot")
-}
 
 extra["springCloudVersion"] = "2025.0.0"
 
@@ -19,9 +16,4 @@ dependencyManagement {
 	imports {
 		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
 	}
-}
-
-// Cấu hình cho Spring Boot để tạo file JAR thực thi được
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    mainClass.set("com.Huy.user_service.UserServiceApplication")
 }

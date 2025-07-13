@@ -1,6 +1,4 @@
-plugins {
-	id("org.springframework.boot")
-}
+
 
 extra["springCloudVersion"] = "2025.0.0"
 
