@@ -1,6 +1,5 @@
 #Stage 1: builder
 FROM gradle:8.8.0-jdk21-jammy AS builder
-WORKDIR /app
 #Cache
 COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY gradle ./gradle
