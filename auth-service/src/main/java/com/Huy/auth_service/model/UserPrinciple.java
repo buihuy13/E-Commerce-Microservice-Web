@@ -21,7 +21,7 @@ public class UserPrinciple implements UserDetails {
         List<String> roles = new ArrayList<>();
         roles.add(user.getRole());
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .map(role -> new SimpleGrantedAuthority(role))
                 .collect(Collectors.toList());
     }
 

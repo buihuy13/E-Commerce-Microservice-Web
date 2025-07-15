@@ -65,6 +65,8 @@ public class AuthService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"))
                 .getAuthority();
+
+        System.out.println("Role: " + role);
         return new TokenResponse(jwtService.generateToken(model.getEmail(), role), jwtService.generateRefreshToken(model.getEmail(), role));
     }
 

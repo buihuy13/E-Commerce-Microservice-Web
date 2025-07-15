@@ -51,7 +51,7 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("timestamp", new Date());
-        errorResponse.put("status", 401);
+        errorResponse.put("status", statusCode);
         errorResponse.put("error", HttpStatus.valueOf(statusCode).getReasonPhrase());
         errorResponse.put("message", message);
         errorResponse.put("path", exchange.getRequest().getURI().getPath());
