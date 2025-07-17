@@ -46,9 +46,14 @@ create table products (
 create table product_details (
     `id` int primary key auto_increment,
     `color` varchar(30) not null,
-    `imagename` varchar(255),
-    `imagetype` varchar(100),
-    `imagedata` longblob,
     `quantity` int not null,
     `product_id` varchar(255) not null references `products`(`id`)
+);
+
+create table images (
+    `id` bigint primary key auto_increment,
+    `imagename` varchar(255) not null,
+    `imagetype` varchar(100) not null,
+    `imagedata` longblob not null,
+    `productdetails_id` int not null references `product_details`(`id`)
 );

@@ -1,6 +1,7 @@
 package com.Huy.product_service.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,6 +12,7 @@ import com.Huy.Common.Event.CartModel;
 import com.Huy.Common.Event.ProductEvent;
 import com.Huy.Common.Exception.ResourceNotFoundException;
 import com.Huy.product_service.dto.request.CreateProductDetailsDTO;
+import com.Huy.product_service.model.Images;
 import com.Huy.product_service.model.Product;
 import com.Huy.product_service.model.ProductDetails;
 import com.Huy.product_service.repository.ProductDetailsRepository;
@@ -22,7 +24,8 @@ import jakarta.transaction.Transactional;
 public class ProductDetailsService {
     private final ProductDetailsRepository productDetailsRepository;
     private final ProductRepository productRepository;
-    public ProductDetailsService(ProductDetailsRepository productDetailsRepository, ProductRepository productRepository) {
+    public ProductDetailsService(ProductDetailsRepository productDetailsRepository, 
+                                 ProductRepository productRepository) {
         this.productDetailsRepository = productDetailsRepository;
         this.productRepository = productRepository;
     }
@@ -41,7 +44,7 @@ public class ProductDetailsService {
     }
 
     @Transactional
-    public ProductDetails createProductDetails(CreateProductDetailsDTO productDetailsDTO, MultipartFile imageFile) throws IOException {
+    public ProductDetails createProductDetails(CreateProductDetailsDTO productDetailsDTO, List<MultipartFile> imageFile) throws IOException {
         Product product = productRepository.findById(productDetailsDTO.getProductId())
                                         .orElseThrow(() -> new ResourceNotFoundException("Cannot find product with id: " + productDetailsDTO.getProductId()));
 
@@ -51,11 +54,18 @@ public class ProductDetailsService {
                                                     .quantity(productDetailsDTO.getQuantity())
                                                     .build();
 
-        if (imageFile != null)
+        if (imageFile != null && imageFile.size() > 0)
         {
-            productDetails.setImageName(imageFile.getOriginalFilename());
-            productDetails.setImageType(imageFile.getContentType());
-            productDetails.setImageData(imageFile.getBytes());
+            List<Images> images = new ArrayList<>();
+            for (MultipartFile file : imageFile) {
+                images.add(Images.builder()
+                                .imageName(file.getOriginalFilename())
+                                .imageType(file.getContentType())
+                                .imageData(file.getBytes())
+                                .productDetails(productDetails)
+                                .build());
+            }
+            productDetails.setImages(images);
         }
         productDetailsRepository.save(productDetails);
 
@@ -63,7 +73,7 @@ public class ProductDetailsService {
     }
 
     @Transactional
-    public ProductDetails updateProductDetails(int id, CreateProductDetailsDTO productDetailsDTO, MultipartFile imageFile) throws IOException {
+    public ProductDetails updateProductDetails(int id, CreateProductDetailsDTO productDetailsDTO, List<MultipartFile> imageFile) throws IOException {
         ProductDetails productDetails = productDetailsRepository.findById(id)
                                             .orElseThrow(() -> new ResourceNotFoundException("Cannot find productdetails with id: " + id));
 
@@ -73,11 +83,18 @@ public class ProductDetailsService {
         productDetails.setQuantity(productDetailsDTO.getQuantity());
         productDetails.setProduct(product);
         
-        if (imageFile != null)
+        if (imageFile != null && imageFile.size() > 0)
         {
-            productDetails.setImageName(imageFile.getOriginalFilename());
-            productDetails.setImageType(imageFile.getContentType());
-            productDetails.setImageData(imageFile.getBytes());
+            List<Images> images = new ArrayList<>();
+            for (MultipartFile file : imageFile) {
+                images.add(Images.builder()
+                                .imageName(file.getOriginalFilename())
+                                .imageType(file.getContentType())
+                                .imageData(file.getBytes())
+                                .productDetails(productDetails)
+                                .build());
+            }
+            productDetails.setImages(images);
         }
 
         return productDetails;

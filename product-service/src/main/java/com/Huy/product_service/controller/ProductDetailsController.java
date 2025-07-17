@@ -46,7 +46,7 @@ public class ProductDetailsController {
 
     @PostMapping()
     public ResponseEntity<ProductDetails> createProduct(@RequestPart(value = "product", required = true) @Valid CreateProductDetailsDTO productDTO,
-                                                        @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException
+                                                        @RequestPart(value = "image", required = false) List<MultipartFile> imageFile) throws IOException
     {
         ProductDetails product = productDetailsService.createProductDetails(productDTO, imageFile);
         return new ResponseEntity<>(product, HttpStatusCode.valueOf(201));
@@ -55,7 +55,7 @@ public class ProductDetailsController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDetails> updateProduct(@PathVariable int id, 
                     @RequestPart(value = "product", required = true) @Valid CreateProductDetailsDTO productDTO, 
-                    @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException
+                    @RequestPart(value = "image", required = false) List<MultipartFile> imageFile) throws IOException
     {
         ProductDetails product = productDetailsService.updateProductDetails(id, productDTO, imageFile);
         return ResponseEntity.ok(product);
