@@ -97,6 +97,8 @@ public class ProductDetailsService {
             productDetails.setImages(images);
         }
 
+        productDetailsRepository.save(productDetails);
+
         return productDetails;
     }
 
