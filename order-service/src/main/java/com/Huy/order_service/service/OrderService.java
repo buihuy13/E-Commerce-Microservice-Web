@@ -14,12 +14,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.Huy.Common.Event.OrderEvent;
 import com.Huy.Common.Event.ProductEvent;
-import com.Huy.Common.Exception.BadPaymentRequestException;
 import com.Huy.Common.Exception.ResourceNotFoundException;
 import com.Huy.order_service.data.BankingStatus;
 import com.Huy.order_service.model.CartItem;
-import com.Huy.order_service.model.OrderRequest;
-import com.Huy.order_service.model.PaymentRequest;
 import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.repository.OrderRepository;
@@ -55,7 +52,7 @@ public class OrderService {
         return sb.toString();
     }
 
-    private List<CartItem> getCartFromSession(HttpSession session) {
+    public List<CartItem> getCartFromSession(HttpSession session) {
         @SuppressWarnings("unchecked")
         List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key);
 
@@ -116,7 +113,7 @@ public class OrderService {
 
     // Đang xem có cần flush để tạo ra order trước không
     @Transactional
-    public Order createOrder(HttpSession session, OrderRequest orderRequest) {
+    public Order createOrder(HttpSession session) {
         List<CartItem> list = getCartFromSession(session);
         if (list == null || list.size() == 0) {
             throw new InvalidParameterException("Chưa mua hàng nào");
@@ -129,30 +126,6 @@ public class OrderService {
         order.setProducts(cartModels);
         orderRepository.save(order);
         return order;
-    }
-
-    // Lúc user mua hàng
-    public String buyProducts(HttpSession session, OrderRequest orderRequest) {
-        Order order = createOrder(session, orderRequest);
-
-        try {
-            String url = webClientBuilder.build()
-                .post()
-                .uri("lb://payment-service/api/payment")
-                .bodyValue(new PaymentRequest(orderRequest.getOrderInfor(), orderRequest.getAmount(), order.getId()))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-            session.removeAttribute(Cart_Key);
-            // gọi đến payment url để banking
-            return url;
-        }
-        catch (Exception e) {
-            order.setStatus(BankingStatus.FAILED.toString());
-            orderRepository.save(order);
-            throw new BadPaymentRequestException("Lỗi khi gọi đến payment service: " + e.getMessage());
-        }
     }
 
     // Xử lý khi payment thành công

@@ -26,12 +26,13 @@ public class VNPayController {
     }
 
     @PostMapping()
-    public ResponseEntity<PaymentResponse> createPayment(HttpServletRequest request, @Valid @RequestBody PaymentRequest paymentRequest) throws UnsupportedEncodingException
+    public ResponseEntity<String> createPayment(HttpServletRequest request, @Valid @RequestBody PaymentRequest paymentRequest) throws UnsupportedEncodingException
     {
         String url = vnPayService.createOrder(request, paymentRequest);
-        return new ResponseEntity(new PaymentResponse(url), HttpStatusCode.valueOf(201));
+        return new ResponseEntity(url, HttpStatusCode.valueOf(201));
     }
 
+    // Trả về trang thanh toán sau khi người dùng hoàn thành giao dịch (có thể là thành công hoặc thất bại)
     @GetMapping("/vnpay-return")
     public ResponseEntity<PaymentResponse> returnURL(HttpServletRequest request)
     {

@@ -1,20 +1,23 @@
 package com.Huy.order_service.controller;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.Huy.order_service.model.MessageResponse;
-import com.Huy.order_service.model.OrderRequest;
 import com.Huy.order_service.model.entity.CartModel;
+import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.service.OrderService;
+import com.Huy.order_service.model.CartItem;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -54,9 +57,16 @@ public class OrderController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<MessageResponse> buyProducts(HttpSession session, @RequestBody @Valid OrderRequest orderRequest)
+    public ResponseEntity<Order> buyProducts(HttpSession session)
     {
-        String res = orderService.buyProducts(session, orderRequest);
-        return ResponseEntity.ok(new MessageResponse(res));
+        Order res = orderService.createOrder(session);
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping() 
+    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session)
+    {
+        List<CartItem> cart = orderService.getCartFromSession(session);
+        return ResponseEntity.ok(cart);
     }
 }
