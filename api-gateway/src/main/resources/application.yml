@@ -48,11 +48,15 @@ spring:
           uri: lb://order-service
           predicates:
           - Path=/api/order/**
+          filters:
+            - name: JwtAuthentication
         - id: product-service-get
           uri: lb://product-service
           predicates:
           - Path=/api/product/**
           - Method=GET
+          filters:
+            - name: JwtAuthentication
         - id: product-service
           uri: lb://product-service
           predicates:
@@ -67,6 +71,8 @@ spring:
           predicates:
           - Path=/api/users/**
           - Method=GET
+          filters:
+            - name: JwtAuthentication
         - id: user-service
           uri: lb://user-service
           predicates:

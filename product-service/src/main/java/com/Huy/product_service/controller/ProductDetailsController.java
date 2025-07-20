@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.Huy.product_service.dto.request.CreateProductDetailsDTO;
 import com.Huy.product_service.dto.response.MessageResponse;
-import com.Huy.product_service.dto.response.Quantity;
 import com.Huy.product_service.model.ProductDetails;
 import com.Huy.product_service.service.ProductDetailsService;
 
@@ -69,9 +68,9 @@ public class ProductDetailsController {
     }
 
     @GetMapping("/{id}/quantity")
-    public ResponseEntity<Quantity> getQuantity(@PathVariable int id)
+    public ResponseEntity<Integer> getQuantity(@PathVariable int id)
     {
         ProductDetails productDetails = productDetailsService.getProductDetailsById(id);
-        return ResponseEntity.ok(new Quantity(productDetails.getQuantity()));
+        return ResponseEntity.ok(productDetails.getQuantity());
     } 
 }

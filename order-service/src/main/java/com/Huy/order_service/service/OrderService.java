@@ -70,7 +70,7 @@ public class OrderService {
             int quantity = cart.getQuantity();
             int currentStock = webClientBuilder.build()
                     .get()
-                    .uri("lb://product-service/api/product-details/{id}/quantity", productDetailsId)
+                    .uri("lb://product-service/api/product/product-details/{id}/quantity", productDetailsId)
                     .retrieve()
                     .bodyToMono(Integer.class)
                     .block();
