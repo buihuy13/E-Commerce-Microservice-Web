@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.kafka.common.errors.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.Huy.order_service.model.MessageResponse;
 import com.Huy.order_service.model.entity.CartModel;
@@ -41,16 +43,18 @@ public class OrderController {
     @Retry(name = "order_product")
     public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartModel cart, HttpSession session) throws SQLIntegrityConstraintViolationException
     {
-        try {
-            orderService.addToCart(cart, session);
-            return CompletableFuture.supplyAsync(() ->ResponseEntity.ok(new MessageResponse("Thêm thành công")));
-        }
-        catch(ResourceNotFoundException ex) {
-            throw new ResourceNotFoundException(ex.getMessage());
-        }
-        catch(SQLIntegrityConstraintViolationException ex) {
-            throw new SQLIntegrityConstraintViolationException(ex.getMessage());
-        }
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                orderService.addToCart(cart, session);
+                return ResponseEntity.ok(new MessageResponse("Thêm thành công"));
+            }
+            catch(ResourceNotFoundException ex) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+            }
+            catch(SQLIntegrityConstraintViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+            }
+        });
     }
 
     public CompletableFuture<String> fallbackMethod(CartModel cart, RuntimeException ex)
