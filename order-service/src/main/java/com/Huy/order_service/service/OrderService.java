@@ -126,6 +126,7 @@ public class OrderService {
         order.setProducts(cartModels);
         orderRepository.save(order);
         orderRepository.flush(); // Đảm bảo order được lưu vào DB trước khi gửi sự kiện
+        order.getProducts().size();
         return order;
     }
 
