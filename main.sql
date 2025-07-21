@@ -28,7 +28,7 @@ create table cart(
  `id` bigint primary key auto_increment,
  `quantity` int not null,
  `productdetailsid` int not null,
- `orderid` varchar(255) references `order`(id)
+ `order_id` varchar(255) references `order`(id)
 );
 
 create database if not exists `product-service`;
