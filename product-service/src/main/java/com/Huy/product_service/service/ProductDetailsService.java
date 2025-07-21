@@ -12,6 +12,7 @@ import com.Huy.Common.Event.CartModel;
 import com.Huy.Common.Event.ProductEvent;
 import com.Huy.Common.Exception.ResourceNotFoundException;
 import com.Huy.product_service.dto.request.CreateProductDetailsDTO;
+import com.Huy.product_service.dto.response.Details;
 import com.Huy.product_service.model.Images;
 import com.Huy.product_service.model.Product;
 import com.Huy.product_service.model.ProductDetails;
@@ -123,5 +124,27 @@ public class ProductDetailsService {
                 productDetailsRepository.save(pd);
             }
         }
+    }
+
+    public Details getProductDetailsInformation(int id) {
+        ProductDetails productDetails = productDetailsRepository.findById(id)
+                                            .orElseThrow(() -> new ResourceNotFoundException("Cannot find productdetails with id: " + id));
+
+        
+        String productId = productDetails.getProductCloneFunction().getId();
+        Product product = productRepository.findById(productId)
+                                            .orElseThrow(() -> new ResourceNotFoundException("Cannot find product with id: " + productId));
+
+        return Details.builder()
+                        .id(productDetails.getId())
+                        .color(productDetails.getColor())
+                        .quantity(productDetails.getQuantity())
+                        .images(productDetails.getImages())
+                        .name(product.getName())
+                        .description(product.getDescription())
+                        .price(product.getPrice())
+                        .category(product.getCategory())
+                        .releaseDate(product.getReleaseDate())
+                        .build();                               
     }
 }

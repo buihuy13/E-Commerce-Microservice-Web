@@ -51,4 +51,8 @@ public class ProductDetails {
         }
         return images;
     }
+
+    public Product getProductCloneFunction() {
+        return product;
+    }
 }

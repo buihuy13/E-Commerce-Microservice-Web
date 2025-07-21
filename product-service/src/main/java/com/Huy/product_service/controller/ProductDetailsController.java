@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.Huy.product_service.dto.request.CreateProductDetailsDTO;
+import com.Huy.product_service.dto.response.Details;
 import com.Huy.product_service.dto.response.MessageResponse;
 import com.Huy.product_service.model.ProductDetails;
 import com.Huy.product_service.service.ProductDetailsService;
@@ -73,4 +74,11 @@ public class ProductDetailsController {
         ProductDetails productDetails = productDetailsService.getProductDetailsById(id);
         return ResponseEntity.ok(productDetails.getQuantity());
     } 
+
+    @GetMapping("/infor/{id}")
+    public ResponseEntity<Details> getProductDetails(@PathVariable int id)
+    {
+        Details details = productDetailsService.getProductDetailsInformation(id);
+        return ResponseEntity.ok(details);
+    }
 }

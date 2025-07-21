@@ -125,6 +125,7 @@ public class OrderService {
         cartModels.forEach(cart -> cart.setOrder(order));
         order.setProducts(cartModels);
         orderRepository.save(order);
+        orderRepository.flush(); // Đảm bảo order được lưu vào DB trước khi gửi sự kiện
         return order;
     }
 
