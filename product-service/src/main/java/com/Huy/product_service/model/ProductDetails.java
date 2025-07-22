@@ -52,7 +52,7 @@ public class ProductDetails {
         return images;
     }
 
-    public Product getProductCloneFunction() {
+    public Product ProductInformationClone() {
         return product;
     }
 }

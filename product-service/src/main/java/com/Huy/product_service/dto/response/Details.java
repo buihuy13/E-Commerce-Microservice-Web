@@ -26,6 +26,7 @@ public class Details {
     private BigDecimal price;
     private String category;
     private Date releaseDate;
+    private String productId;
 
     public List<Images> getImages() {
         if (images == null) {

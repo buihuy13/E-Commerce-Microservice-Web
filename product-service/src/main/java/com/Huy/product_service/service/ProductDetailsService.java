@@ -131,12 +131,13 @@ public class ProductDetailsService {
                                             .orElseThrow(() -> new ResourceNotFoundException("Cannot find productdetails with id: " + id));
 
         
-        String productId = productDetails.getProductCloneFunction().getId();
+        String productId = productDetails.ProductInformationClone().getId();
         Product product = productRepository.findById(productId)
                                             .orElseThrow(() -> new ResourceNotFoundException("Cannot find product with id: " + productId));
 
         return Details.builder()
                         .id(productDetails.getId())
+                        .productId(productId)
                         .color(productDetails.getColor())
                         .quantity(productDetails.getQuantity())
                         .images(productDetails.getImages())
