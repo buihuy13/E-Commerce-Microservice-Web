@@ -55,8 +55,6 @@ spring:
           predicates:
           - Path=/api/product/**
           - Method=GET
-          filters:
-            - name: JwtAuthentication
         - id: product-service
           uri: lb://product-service
           predicates:

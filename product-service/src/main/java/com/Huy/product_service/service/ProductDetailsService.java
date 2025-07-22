@@ -137,6 +137,7 @@ public class ProductDetailsService {
 
         return Details.builder()
                         .id(productDetails.getId())
+                        .productId(productId)
                         .color(productDetails.getColor())
                         .quantity(productDetails.getQuantity())
                         .images(productDetails.getImages())
