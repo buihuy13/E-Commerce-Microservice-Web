@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+  labels:
+    app: userservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userservice
+  template:
+    metadata:
+      labels:
+        app: userservice
+    spec:
+      containers:
+      - name: user-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8082
+        env:
+          - name: USER_SERVICE_DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: user-secret
+                key: USER_SERVICE_DB_URL
+          - name: USER_SERVICE_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: user-secret
+                key: USER_SERVICE_DB_USER
+          - name: USER_SERVICE_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: user-secret
+                key: USER_SERVICE_DB_PASS
+          - name: USER_SERVICE_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: user-secret
+                key: USER_SERVICE_DB_NAME
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: user-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: user-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: user-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app: userservice
+spec:
+  ports:
+  - port: 8082
+    targetPort: 8082
+    protocol: TCP
+  selector:
+    app: userservice
+  type: ClusterIP

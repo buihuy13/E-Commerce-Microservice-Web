@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+data:
+  ZIPKIN_ENDPOINT: "http://zipkin:9411/api/v2/spans"
+  EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
+  PORT: 8081

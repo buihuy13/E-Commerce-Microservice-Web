@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-deployment
+  labels:
+    app: orderservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orderservice
+  template:
+    metadata:
+      labels:
+        app: orderservice
+    spec:
+      containers:
+      - name: order-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8085
+        env:
+          - name: ORDER_SERVICE_DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: order-secret
+                key: ORDER_SERVICE_DB_URL
+          - name: ORDER_SERVICE_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: order-secret
+                key: ORDER_SERVICE_DB_USER
+          - name: ORDER_SERVICE_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: order-secret
+                key: ORDER_SERVICE_DB_PASS
+          - name: ORDER_SERVICE_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: order-secret
+                key: ORDER_SERVICE_DB_NAME
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  labels:
+    app: orderservice
+spec:
+  ports:
+  - port: 8085
+    targetPort: 8085
+    protocol: TCP
+  selector:
+    app: orderservice
+  type: ClusterIP

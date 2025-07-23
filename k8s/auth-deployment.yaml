@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  labels:
+    app: authservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authservice
+  template:
+    metadata:
+      labels:
+        app: authservice
+    spec:
+      containers:
+      - name: auth-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8081
+        env:
+          - name: JWT_SECRETKEY
+            valueFrom:
+              secretKeyRef:
+                name: auth-secret
+                key: JWT_SECRETKEY
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: auth-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: auth-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: auth-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  labels:
+    app: authservice
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+  selector:
+    app: authservice
+  type: ClusterIP

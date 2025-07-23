@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  labels:
+    app: gatewayserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gatewayserver
+  template:
+    metadata:
+      labels:
+        app: gatewayserver
+    spec:
+      containers:
+      - name: gateway-server
+        image: Chưa có image
+        ports:
+        - containerPort: 8080
+        env:
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: gateway-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: gateway-config
+                key: EUREKA_SERVER_URL
+          - name: EUREKA_SERVER_URI
+            valueFrom:
+              configMapKeyRef:
+                name: gateway-config
+                key: EUREKA_SERVER_URI
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: gateway-config
+                key: PORT
+          - name: JWT_SECRETKEY
+            valueFrom:
+              secretKeyRef:
+                name: gateway-secret
+                key: JWT_SECRETKEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  labels:
+    app: gatewayserver
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: gatewayserver
+  type: LoadBalancer

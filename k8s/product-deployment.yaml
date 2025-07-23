@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+  labels:
+    app: productservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productservice
+  template:
+    metadata:
+      labels:
+        app: productservice
+    spec:
+      containers:
+      - name: product-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8084
+        env:
+          - name: PRODUCT_SERVICE_DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: product-secret
+                key: PRODUCT_SERVICE_DB_URL
+          - name: PRODUCT_SERVICE_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: product-secret
+                key: PRODUCT_SERVICE_DB_USER
+          - name: PRODUCT_SERVICE_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: product-secret
+                key: PRODUCT_SERVICE_DB_PASS
+          - name: PRODUCT_SERVICE_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: product-secret
+                key: PRODUCT_SERVICE_DB_NAME
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: product-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: product-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: product-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+  labels:
+    app: productservice
+spec:
+  ports:
+  - port: 8084
+    targetPort: 8084
+    protocol: TCP
+  selector:
+    app: productservice
+  type: ClusterIP

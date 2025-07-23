@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  labels:
+    app: notificationservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificationservice
+  template:
+    metadata:
+      labels:
+        app: notificationservice
+    spec:
+      containers:
+      - name: notification-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8083
+        env:
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  labels:
+    app: notificationservice
+spec:
+  ports:
+  - port: 8083
+    targetPort: 8083
+    protocol: TCP
+  selector:
+    app: notificationservice
+  type: ClusterIP
