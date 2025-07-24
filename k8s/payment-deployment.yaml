@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-deployment
+  labels:
+    app: paymentservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+    spec:
+      containers:
+      - name: payment-service
+        image: Chưa có image
+        ports:
+        - containerPort: 8086
+        env:
+          - name: VNPAY_TMN_CODE
+            valueFrom:
+              secretKeyRef:
+                name: payment-secret
+                key: VNPAY_TMN_CODE
+          - name: VNPAY_HASH_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: payment-secret
+                key: VNPAY_HASH_SECRET
+          - name: VNPAY_URL
+            valueFrom:
+              secretKeyRef:
+                name: payment-secret
+                key: VNPAY_URL
+          - name: VNPAY_IPN_URL
+            valueFrom:
+              secretKeyRef:
+                name: payment-secret
+                key: VNPAY_IPN_URL
+          - name: ZIPKIN_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: payment-config
+                key: ZIPKIN_ENDPOINT
+          - name: EUREKA_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: payment-config
+                key: EUREKA_SERVER_URL
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: payment-config
+                key: PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  labels:
+    app: paymentservice
+spec:
+  ports:
+  - port: 8086
+    targetPort: 8086
+    protocol: TCP
+  selector:
+    app: paymentservice
+  type: ClusterIP
