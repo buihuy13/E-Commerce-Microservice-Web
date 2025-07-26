@@ -187,11 +187,12 @@ services:
       - PORT=8086
     depends_on:
       - service-discovery
-    frontend:
-      build:
-        dockerfile: ./frontend/Dockerfile
-      ports:
-        - "3000:3000"
+  frontend:
+    build:
+      context: ./clothesWebsite
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
 
 volumes:
   mysql_data:
