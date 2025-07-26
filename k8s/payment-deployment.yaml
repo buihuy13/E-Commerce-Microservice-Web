@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: Chưa có image
+        image: buihuy13/payment-service:latest
         ports:
         - containerPort: 8086
         env:

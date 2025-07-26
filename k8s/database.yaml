@@ -7,17 +7,6 @@ data:
   MYSQL_ROOT_PASSWORD: 'c2VjcmV0'
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
 kind: Service
 metadata:
   name: mysql-service
@@ -39,6 +28,14 @@ spec:
       app: mysql
   serviceName: "mysql-service"
   replicas: 1
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-persistent-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
   template:
     metadata:
       labels:
@@ -58,7 +55,3 @@ spec:
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pvc

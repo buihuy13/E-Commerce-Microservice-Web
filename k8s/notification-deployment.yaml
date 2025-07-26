@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: Chưa có image
+        image: buihuy13/notification-service:latest
         ports:
         - containerPort: 8083
         env:

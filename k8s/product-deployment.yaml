@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: product-service
-        image: Chưa có image
+        image: buihuy13/product-service:latest
         ports:
         - containerPort: 8084
         env:

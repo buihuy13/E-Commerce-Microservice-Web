@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: Chưa có image
+        image: buihuy13/order-service:latest
         ports:
         - containerPort: 8085
         env:
