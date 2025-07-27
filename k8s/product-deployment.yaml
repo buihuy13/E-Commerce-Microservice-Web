@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: product-service
-        image: buihuy13/product-service:latest
+        image: quochuy1304acrregistry.azurecr.io/product-service:latest
         ports:
         - containerPort: 8084
         env:

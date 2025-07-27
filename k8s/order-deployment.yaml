@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: buihuy13/order-service:latest
+        image: quochuy1304acrregistry.azurecr.io/order-service:latest
         ports:
         - containerPort: 8085
         env:

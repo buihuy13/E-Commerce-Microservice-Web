@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: buihuy13/user-service:latest
+        image: quochuy1304acrregistry.azurecr.io/user-service:latest
         ports:
         - containerPort: 8082
         env:

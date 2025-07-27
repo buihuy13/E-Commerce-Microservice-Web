@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: buihuy13/notification-service:latest
+        image: quochuy1304acrregistry.azurecr.io/notification-service:latest
         ports:
         - containerPort: 8083
         env:

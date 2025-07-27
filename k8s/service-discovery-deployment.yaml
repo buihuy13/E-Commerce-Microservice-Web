@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: service-discovery
-        image: buihuy13/service-discovery:latest
+        image: quochuy1304acrregistry.azurecr.io/service-discovery:latest
         ports:
         - containerPort: 8761
         env:

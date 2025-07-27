@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: gateway-server
-        image: buihuy13/api-gateway:latest
+        image: quochuy1304acrregistry.azurecr.io/api-gateway:latest
         ports:
         - containerPort: 8080
         env:

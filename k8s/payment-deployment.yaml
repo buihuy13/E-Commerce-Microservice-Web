@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: buihuy13/payment-service:latest
+        image: quochuy1304acrregistry.azurecr.io/payment-service:latest
         ports:
         - containerPort: 8086
         env:
