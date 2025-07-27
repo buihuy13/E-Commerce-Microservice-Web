@@ -5,4 +5,4 @@ metadata:
 data:
   ZIPKIN_ENDPOINT: "http://zipkin:9411/api/v2/spans"
   EUREKA_HOST_NAME: "service-discovery"
-  PORT: 8761
+  PORT: "8761"
