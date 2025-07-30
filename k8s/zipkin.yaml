@@ -14,8 +14,17 @@ spec:
       labels:
         app: zipkin
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: zipkin
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "50m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
         image: openzipkin/zipkin
         ports:
         - containerPort: 9411

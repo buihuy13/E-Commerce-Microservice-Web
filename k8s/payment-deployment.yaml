@@ -14,8 +14,17 @@ spec:
       labels:
         app: paymentservice
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: payment-service
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "800m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
         image: quochuy1304acrregistry.azurecr.io/payment-service:latest
         ports:
         - containerPort: 8086
@@ -40,6 +49,11 @@ spec:
               secretKeyRef:
                 name: payment-secret
                 key: VNPAY_IPN_URL
+          - name: VNPAY_RETURN_URL
+            valueFrom:
+              secretKeyRef:
+                name: payment-secret
+                key: VNPAY_RETURN_URL
           - name: ZIPKIN_ENDPOINT
             valueFrom:
               configMapKeyRef:
@@ -55,6 +69,8 @@ spec:
               configMapKeyRef:
                 name: payment-config
                 key: PORT
+          - name: JAVA_OPTS
+            value: "-XX:+UseG1GC"
 
 ---
 apiVersion: v1

@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: order-config
 data:
-  ZIPKIN_ENDPOINT: "http://zipkin:9411/api/v2/spans"
+  ZIPKIN_ENDPOINT: "http://zipkin-service:9411/api/v2/spans"
   EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
   PORT: "8085"

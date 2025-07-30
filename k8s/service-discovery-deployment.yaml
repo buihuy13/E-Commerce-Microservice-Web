@@ -14,8 +14,17 @@ spec:
       labels:
         app: service-discovery
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: service-discovery
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "350m"
         image: quochuy1304acrregistry.azurecr.io/service-discovery:latest
         ports:
         - containerPort: 8761

@@ -1,21 +1,29 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: gateway-ingress
+  name: ingress
 spec:
+  ingressClassName: nginx
   defaultBackend:
     service:
-      name: gateway-service
+      name: frontend
       port:
-        number: 8080
+        number: 80
   rules:
-  - host: microservice-web-example
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: gateway-service
-            port:
-              number: 8080
+    - host:
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend
+              port:
+                number: 80
+        - path: /api/
+          pathType: Prefix
+          backend:
+            service:
+              name: api-gateway
+              port:
+                number: 8080

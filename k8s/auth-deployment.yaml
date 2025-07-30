@@ -14,8 +14,17 @@ spec:
       labels:
         app: authservice
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: auth-service
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "150m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
         image: quochuy1304acrregistry.azurecr.io/auth-service:latest
         ports:
         - containerPort: 8081

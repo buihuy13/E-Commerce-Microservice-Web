@@ -14,8 +14,17 @@ spec:
       labels:
         app: productservice
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: product-service
+        resources:
+          requests:
+            memory: "150Mi"
+            cpu: "300m"
+          limits:
+            memory: "384Mi"
+            cpu: "750m"
         image: quochuy1304acrregistry.azurecr.io/product-service:latest
         ports:
         - containerPort: 8084

@@ -14,8 +14,17 @@ spec:
       labels:
         app: notificationservice
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: notification-service
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
         image: quochuy1304acrregistry.azurecr.io/notification-service:latest
         ports:
         - containerPort: 8083

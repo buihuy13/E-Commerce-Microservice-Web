@@ -14,8 +14,17 @@ spec:
       labels:
         app: orderservice
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: order-service
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "150m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
         image: quochuy1304acrregistry.azurecr.io/order-service:latest
         ports:
         - containerPort: 8085

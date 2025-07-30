@@ -14,8 +14,17 @@ spec:
       labels:
         app: kafka
     spec:
+      nodeSelector:
+        agentpool: nodepool1
       containers:
       - name: kafka
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "900m"
+          limits:
+            memory: "700Mi"
+            cpu: "1200m"
         image: confluentinc/cp-kafka:7.3.2
         ports:
         - containerPort: 9092
@@ -30,6 +39,12 @@ spec:
           value: "PLAINTEXT://kafka-service:9092"
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "1"
+        - name: KAFKA_COMPRESSION_TYPE
+          value: "snappy"
+        - name: KAFKA_BATCH_SIZE
+          value: "163840"
+        - name: KAFKA_LINGER_MS
+          value: "100"
 ---
 apiVersion: v1
 kind: Service

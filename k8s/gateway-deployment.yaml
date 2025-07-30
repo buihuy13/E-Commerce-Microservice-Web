@@ -14,8 +14,17 @@ spec:
       labels:
         app: gatewayserver
     spec:
+      nodeSelector:
+        agentpool: powerfulpool
       containers:
       - name: gateway-server
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "150m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
         image: quochuy1304acrregistry.azurecr.io/api-gateway:latest
         ports:
         - containerPort: 8080
@@ -60,4 +69,4 @@ spec:
     protocol: TCP
   selector:
     app: gatewayserver
-  type: LoadBalancer
+  type: ClusterIP
