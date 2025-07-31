@@ -1,3 +1,7 @@
+drop database if exists `order-service`;
+drop database if exists `product-service`;
+drop database if exists `user-service`;
+
 create database if not exists `user-service`;
 use `user-service`;
 
@@ -10,12 +14,12 @@ create table users(
  `address` varchar(255) not null,
  `role` varchar(10) not null,
  `active` varchar(20) not null,
- `verificationcode` varchar(255) not null,
+ `verificationcode` varchar(255) not null
  );
 
-insert into users(id, `password`, username, email, phone, address, `role`) values 
-("testadminid", "$2a$12$xv4.GmxuJeUUs54wJNwPdODdcvnHs7ikvpCuLeVVMy4tki5hZLq/m", "testadmin", "testadmin@gmail.com", "0762612698", "TPHCM", "ADMIN"),
-("testuserid", "$2a$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testuser", "testuser@gmail.com", "0762612699", "TP Vinh, Nghe An", "USER");
+insert into users(id, `password`, username, email, phone, address, `role`, `active`, `verificationcode`) values 
+("testadminid", "$2a$12$xv4.GmxuJeUUs54wJNwPdODdcvnHs7ikvpCuLeVVMy4tki5hZLq/m", "testadmin", "testadmin@gmail.com", "0762612698", "TPHCM", "ADMIN", "ACTIVE", "abcxyz123"),
+("testuserid", "$2a$12$CydeMvJj1Hvu/824Lh2NuOEIrZnlhRMIUM736cYXa7bSD3LUmGW7K", "testuser", "testuser@gmail.com", "0762612699", "TP Vinh, Nghe An", "USER", "ACTIVE", "abcxyz456");
 
 
 create database if not exists `order-service`;
@@ -25,7 +29,7 @@ create table `order`(
  `id` varchar(255) primary key,
  `status` varchar(20) not null,
  `user_id` varchar(255) not null,
- `created_at` date not null,
+ `created_at` date not null
 );
 
 create table cart(
