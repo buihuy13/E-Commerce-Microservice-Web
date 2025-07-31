@@ -23,7 +23,9 @@ use `order-service`;
 
 create table `order`( 
  `id` varchar(255) primary key,
- `status` varchar(20) not null
+ `status` varchar(20) not null,
+ `user_id` varchar(255) not null,
+ `created_at` date not null,
 );
 
 create table cart(
