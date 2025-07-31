@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.Huy.order_service.model.MessageResponse;
+import com.Huy.order_service.model.request;
 import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.service.OrderService;
@@ -37,15 +38,17 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping()
+    @PostMapping("/{id}")
     @CircuitBreaker(name = "order_product", fallbackMethod = "fallbackMethod")
     @TimeLimiter(name = "order_product")
     @Retry(name = "order_product")
-    public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartModel cart, HttpSession session) throws SQLIntegrityConstraintViolationException
+    public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartModel cart,
+                                                                        HttpSession session, 
+                                                                        @PathVariable String id) throws SQLIntegrityConstraintViolationException
     {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                orderService.addToCart(cart, session);
+                orderService.addToCart(cart, session, id);
                 return ResponseEntity.ok(new MessageResponse("Thêm thành công"));
             }
             catch(ResourceNotFoundException ex) {
@@ -63,23 +66,44 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, HttpSession session)
+    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, HttpSession session, request rq)
     {
-        orderService.removeFromCart(session, id);
+        orderService.removeFromCart(session, id, rq);
         return ResponseEntity.ok(new MessageResponse("Xóa thành công"));
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<Order> buyProducts(HttpSession session)
+    public ResponseEntity<Order> buyProducts(HttpSession session, request rq)
     {
-        Order res = orderService.createOrder(session);
+        Order res = orderService.createOrder(session,rq);
         return ResponseEntity.ok(res);
     }
 
     @GetMapping() 
-    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session)
+    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session, request rq)
     {
-        List<CartItem> cart = orderService.getCartFromSession(session);
+        List<CartItem> cart = orderService.getCartFromSession(session, rq);
         return ResponseEntity.ok(cart);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Order>> getAllOrders()
+    {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable String id)
+    {
+        Order order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable String userId)
+    {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
     }
 }

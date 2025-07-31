@@ -1,5 +1,6 @@
 package com.Huy.user_service.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -34,4 +35,7 @@ public class Users {
     private String address;
     @NotBlank(message = "Role is mandatory")
     private String role;
+    private String active;
+    @Column(name = "verificationcode")
+    private String verificationCode;
 }

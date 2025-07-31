@@ -37,6 +37,9 @@ public class ProductDetails {
     @Min(0)
     private Integer quantity;
 
+    @NotBlank(message = "Size cannot be blank")
+    private String size;
+
     @Getter(lombok.AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

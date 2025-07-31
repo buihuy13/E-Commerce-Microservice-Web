@@ -2,9 +2,13 @@ package com.Huy.order_service.service;
 
 import java.security.InvalidParameterException;
 import java.security.SecureRandom;
+import java.sql.Date;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -17,6 +21,7 @@ import com.Huy.Common.Event.ProductEvent;
 import com.Huy.Common.Exception.ResourceNotFoundException;
 import com.Huy.order_service.data.BankingStatus;
 import com.Huy.order_service.model.CartItem;
+import com.Huy.order_service.model.request;
 import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.repository.OrderRepository;
@@ -52,9 +57,9 @@ public class OrderService {
         return sb.toString();
     }
 
-    public List<CartItem> getCartFromSession(HttpSession session) {
+    public List<CartItem> getCartFromSession(HttpSession session, request rq) {
         @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key);
+        List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key + rq.getUserId());
 
         if (cart == null) {
             cart = new ArrayList<CartItem>();
@@ -64,7 +69,7 @@ public class OrderService {
     }
 
     // Còn trường hợp race condition chưa được xử lý
-    public void addToCart(CartModel cart, HttpSession session) throws SQLIntegrityConstraintViolationException {
+    public void addToCart(CartModel cart, HttpSession session, String id) throws SQLIntegrityConstraintViolationException {
         try {
             int productDetailsId = cart.getProductDetailsId();
             int quantity = cart.getQuantity();
@@ -81,7 +86,7 @@ public class OrderService {
             }
 
             CartItem newReservation = new CartItem(quantity, productDetailsId);
-            List<CartItem> list = getCartFromSession(session);
+            List<CartItem> list = getCartFromSession(session, new request(id));
             var cartItemFound = list.stream()
                     .filter(item -> item.getProductDetailsId() == productDetailsId)
                     .findFirst();
@@ -102,8 +107,8 @@ public class OrderService {
     }
 
     // Xóa đặt chỗ khi người dùng tự xóa khỏi giỏ hàng.
-    public void removeFromCart(HttpSession session, int productId) {
-        List<CartItem> list = getCartFromSession(session);
+    public void removeFromCart(HttpSession session, int productId, request rq) {
+        List<CartItem> list = getCartFromSession(session, rq);
         CartItem cartModel = list.stream().filter(p -> p.getProductDetailsId() == productId)
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm trong giỏ hàng"));
@@ -111,17 +116,16 @@ public class OrderService {
         session.setAttribute(Cart_Key, list);
     }
 
-    // Đang xem có cần flush để tạo ra order trước không
     @Transactional
-    public Order createOrder(HttpSession session) {
-        List<CartItem> list = getCartFromSession(session);
+    public Order createOrder(HttpSession session, request rq) {
+        List<CartItem> list = getCartFromSession(session, rq);
         if (list == null || list.size() == 0) {
             throw new InvalidParameterException("Chưa mua hàng nào");
         }
         List<CartModel> cartModels = list.stream()
                 .map(cartItem -> new CartModel(cartItem.getQuantity(), cartItem.getProductDetailsId())).toList();
         String randomId = generateRandomId(20);
-        Order order = new Order(randomId, BankingStatus.PENDING.toString(), null);
+        Order order = new Order(randomId, BankingStatus.PENDING.toString(), Date.valueOf(LocalDate.now()), rq.getUserId(), null);
         cartModels.forEach(cart -> cart.setOrder(order));
         order.setProducts(cartModels);
         orderRepository.save(order);
@@ -154,6 +158,25 @@ public class OrderService {
                             .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy order với id: " + orderId));
         order.setStatus(BankingStatus.FAILED.toString());
         orderRepository.save(order);
+    }
+
+    public List<Order> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders;
+    }
+
+    public Order getOrderById(String id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy order với id: " + id));
+        return order;
+    }
+
+    public List<Order> getOrdersByUserId(String userId) {
+        Optional<List<Order>> optionalOrders = orderRepository.findOrderByUserId(userId);
+        if (optionalOrders.isEmpty()) {
+            return new ArrayList<Order>();
+        }
+        return optionalOrders.get();
     }
 }
 

@@ -44,6 +44,11 @@ spec:
               configMapKeyRef:
                 name: notification-config
                 key: PORT
+          - name: KAFKA_SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: KAFKA_SERVER
 
 ---
 apiVersion: v1

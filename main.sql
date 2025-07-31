@@ -8,7 +8,9 @@ create table users(
  `email` varchar(255) not null unique,
  `phone` varchar(20) not null,
  `address` varchar(255) not null,
- `role` varchar(10) not null
+ `role` varchar(10) not null,
+ `active` varchar(20) not null,
+ `verificationcode` varchar(255) not null,
  );
 
 insert into users(id, `password`, username, email, phone, address, `role`) values 
@@ -47,6 +49,7 @@ create table product_details (
     `id` int primary key auto_increment,
     `color` varchar(30) not null,
     `quantity` int not null,
+    `size` varchar(30) not null,
     `product_id` varchar(255) not null references `products`(`id`)
 );
 

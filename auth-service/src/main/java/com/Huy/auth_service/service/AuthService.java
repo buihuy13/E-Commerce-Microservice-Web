@@ -1,5 +1,6 @@
 package com.Huy.auth_service.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,13 +9,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import com.Huy.Common.Event.ConfirmationEvent;
+import com.Huy.Common.Exception.InactivateException;
 import com.Huy.Common.Exception.InvalidParameters;
 import com.Huy.Common.Exception.ResourceNotFoundException;
+import com.Huy.auth_service.data.activation;
 import com.Huy.auth_service.dto.request.LoginDTO;
 import com.Huy.auth_service.dto.request.RegisterDTO;
 import com.Huy.auth_service.dto.response.TokenResponse;
 import com.Huy.auth_service.dto.response.UserDetails;
+import com.Huy.auth_service.model.UserPrinciple;
 import com.Huy.auth_service.model.Users;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,29 +28,38 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthService {
+    
+    @Value("${URL}")
+    private String url;
+
     private final BCryptPasswordEncoder passwordEncoder;
     private final WebClient.Builder webClientBuilder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final kafkaTemplate kafkaTemplate;
 
     public AuthService(BCryptPasswordEncoder passwordEncoder, WebClient.Builder webClientBuilder,
-                       AuthenticationManager authenticationManager, JwtService jwtService) {
+                       AuthenticationManager authenticationManager, JwtService jwtService, KafkaTemplate kafkaTemplate) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.webClientBuilder = webClientBuilder;
         this.passwordEncoder = passwordEncoder;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public void registerUser(RegisterDTO registerDTO) throws InvalidParameters {
         registerDTO.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         try {
-            webClientBuilder.build()
-                .post()
-                .uri("lb://user-service/api/users")
-                .bodyValue(registerDTO)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            String verificationCode = webClientBuilder.build()
+                                                        .post()
+                                                        .uri("lb://user-service/api/users")
+                                                        .bodyValue(registerDTO)
+                                                        .retrieve()
+                                                        .bodyToMono(String.class)
+                                                        .block();
+
+            kafkaTemplate.send("confirmationTopic", new ConfirmationEvent(registerDTO.getEmail(), 
+                    url + "/api/users/confirm?code=" + verificationCode));
         }
         catch(WebClientResponseException e)
         {
@@ -66,7 +81,13 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"))
                 .getAuthority();
 
-        System.out.println("Role: " + role);
+        if (authentication.getPrincipal() instanceof UserPrinciple userPrinciple) {
+            if (userPrinciple.getActive().equals(activation.INACTIVATE.toString())) {
+                throw new InactivateException("User account is not active");
+            }
+        } else {
+            throw new ResourceNotFoundException("User details not found");
+        }
         return new TokenResponse(jwtService.generateToken(model.getEmail(), role), jwtService.generateRefreshToken(model.getEmail(), role));
     }
 

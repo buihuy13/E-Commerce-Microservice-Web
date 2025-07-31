@@ -14,7 +14,8 @@ public class RouterValidator {
         "/api/auth/login",
         "/api/auth/register",
         "/api/auth/accesstoken",
-        "/eureka/web"
+        "/eureka/web",
+        "api/users/confirm"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

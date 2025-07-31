@@ -71,6 +71,11 @@ spec:
                 key: PORT
           - name: JAVA_OPTS
             value: "-XX:+UseG1GC"
+          - name: KAFKA_SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: payment-config
+                key: KAFKA_SERVER
 
 ---
 apiVersion: v1

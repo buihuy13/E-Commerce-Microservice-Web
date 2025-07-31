@@ -22,4 +22,6 @@ public class Users {
     private String phone;
     private String address;
     private String role;
+    private String verificationCode;
+    private String active;
 }

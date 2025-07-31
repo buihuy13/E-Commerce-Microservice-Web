@@ -19,4 +19,7 @@ public class CreateProductDetailsDTO {
     private String productId;
     @Min(0)
     private Integer quantity;
+
+    @NotBlank(message = "Size cannot be blank")
+    private String size;
 }

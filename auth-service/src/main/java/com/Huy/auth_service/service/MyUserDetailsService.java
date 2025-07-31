@@ -28,7 +28,7 @@ public class MyUserDetailsService implements UserDetailsService {
                 .block();   
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
-        }  
+        } 
         return new UserPrinciple(user);
     }
 

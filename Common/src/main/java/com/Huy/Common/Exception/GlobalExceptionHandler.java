@@ -103,6 +103,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InactivateException.class)
+    public ResponseEntity<ErrorResponse> handleInactivateException(InactivateException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            "INACTIVATED_ACCOUNT", 
+            ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     // Xử lý exception chung
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {

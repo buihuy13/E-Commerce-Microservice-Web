@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import com.Huy.notification_service.model.ConfirmationBody;
 import com.Huy.notification_service.model.RequestBody;
 
 import jakarta.mail.MessagingException;
@@ -34,9 +35,8 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String username;
 
-    //@KafkaListener(topics = "notificationTopic")
+    @KafkaListener(topics = "notificationTopic")
     public void sendEmail(RequestBody request) {
-        log.info("Sending emails...");
         try {
             Context context = new Context();
             Map<String, Object> map = new HashMap<>();
@@ -44,6 +44,30 @@ public class EmailService {
             map.put("success", request.isSuccess());
             context.setVariables(map);
             String process = springTemplateEngine.process("welcome", context);
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            String subject = StringUtils
+                    .join(Arrays.asList("Greetings", request.getEmail(), "!!!"), ' ');
+            helper.setSubject(subject);
+            helper.setText(process, true);
+            helper.setTo(request.getEmail());
+            helper.setFrom(username);
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException | MailException ex) {
+            log.error("Xảy ra lỗi khi gửi mail, " + ex.getMessage(), ex);
+            throw new RuntimeException("Lỗi khi gửi mail, " + ex.getMessage(), ex);
+        }
+    }
+
+    @KafkaListener(topics = "confirmationTopic")
+    public void sendConfirmationEmail(ConfirmationBody request) {
+        try {
+            Context context = new Context();
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", request.getEmail());
+            map.put("url", request.getUrl());
+            context.setVariables(map);
+            String process = springTemplateEngine.process("confirmation", context);
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
             String subject = StringUtils

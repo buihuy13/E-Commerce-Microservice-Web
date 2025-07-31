@@ -64,6 +64,11 @@ spec:
               configMapKeyRef:
                 name: product-config
                 key: PORT
+          - name: KAFKA_SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: product-config
+                key: KAFKA_SERVER
 
 ---
 apiVersion: v1

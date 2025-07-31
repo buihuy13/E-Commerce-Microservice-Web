@@ -53,6 +53,7 @@ public class ProductDetailsService {
                                                     .color(productDetailsDTO.getColor())
                                                     .product(product)
                                                     .quantity(productDetailsDTO.getQuantity())
+                                                    .size(productDetailsDTO.getSize())
                                                     .build();
 
         if (imageFile != null && imageFile.size() > 0)
@@ -83,6 +84,7 @@ public class ProductDetailsService {
         productDetails.setColor(productDetailsDTO.getColor());
         productDetails.setQuantity(productDetailsDTO.getQuantity());
         productDetails.setProduct(product);
+        productDetails.setSize(productDetailsDTO.getSize());
         
         if (imageFile != null && imageFile.size() > 0)
         {
@@ -146,6 +148,7 @@ public class ProductDetailsService {
                         .price(product.getPrice())
                         .category(product.getCategory())
                         .releaseDate(product.getReleaseDate())
+                        .size(productDetails.getSize())
                         .build();                               
     }
 }

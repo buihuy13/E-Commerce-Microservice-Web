@@ -27,6 +27,7 @@ public class Details {
     private String category;
     private Date releaseDate;
     private String productId;
+    private String size;
 
     public List<Images> getImages() {
         if (images == null) {

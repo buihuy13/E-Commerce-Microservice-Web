@@ -8,6 +8,6 @@ import com.Huy.user_service.model.Users;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, String> {
-
     Users findByEmail(String email);
+    Users findByVerificationCode(String code);
 }

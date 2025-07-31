@@ -1,8 +1,11 @@
 package com.Huy.user_service.service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import com.Huy.user_service.data.activation;
 import com.Huy.user_service.dto.request.CreateUserDTO;
 import com.Huy.user_service.dto.request.UpdateUserDTO;
 import com.Huy.user_service.model.Users;
@@ -33,9 +36,10 @@ public class UserService {
     }
 
     @Transactional
-    public void createUsers(CreateUserDTO users) {
+    public String createUsers(CreateUserDTO users) {
         Users newUser = Utils.mapCreateUserDTOtoUsers(users);
         userRepository.save(newUser);
+        return newUser.getVerificationCode();
     }
 
     @Transactional
@@ -51,5 +55,16 @@ public class UserService {
     public void deleteUser(String id) {
         Users existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(existingUser);
+    }
+
+    public void acitvateAccount(String code) throws SQLIntegrityConstraintViolationException {
+        Users user = userRepository.findByVerificationCode(code);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with verification code: " + code);
+        }
+        if (user.getActive().equals(activation.ACTIVATE.toString())) {
+            throw new SQLIntegrityConstraintViolationException("Account is already activated");
+        }
+        user.setActive(activation.ACTIVATE.toString());
     }
 }
