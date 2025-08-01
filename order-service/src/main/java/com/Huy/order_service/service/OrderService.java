@@ -57,13 +57,13 @@ public class OrderService {
         return sb.toString();
     }
 
-    public List<CartItem> getCartFromSession(HttpSession session, request rq) {
+    public List<CartItem> getCartFromSession(HttpSession session, String userId) {
         @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key + rq.getUserId());
+        List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key + userId);
 
         if (cart == null) {
             cart = new ArrayList<CartItem>();
-            session.setAttribute(Cart_Key + rq.getUserId(), cart);
+            session.setAttribute(Cart_Key + userId, cart);
         }
         return cart;
     }
@@ -84,7 +84,7 @@ public class OrderService {
                 throw new SQLIntegrityConstraintViolationException(
                         "Không còn đủ số lượng cho productId: " + productDetailsId);
             }
-            List<CartItem> list = getCartFromSession(session, new request(id));
+            List<CartItem> list = getCartFromSession(session, id);
             var cartItemFound = list.stream()
                     .filter(item -> item.getProductDetailsId() == productDetailsId)
                     .findFirst();
@@ -107,7 +107,7 @@ public class OrderService {
 
     // Xóa đặt chỗ khi người dùng tự xóa khỏi giỏ hàng.
     public void removeFromCart(HttpSession session, int productId, request rq) {
-        List<CartItem> list = getCartFromSession(session, rq);
+        List<CartItem> list = getCartFromSession(session, rq.getUserId());
         CartItem cartModel = list.stream().filter(p -> p.getProductDetailsId() == productId)
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm trong giỏ hàng"));
@@ -117,7 +117,7 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(HttpSession session, request rq) {
-        List<CartItem> list = getCartFromSession(session, rq);
+        List<CartItem> list = getCartFromSession(session, rq.getUserId());
         if (list == null || list.size() == 0) {
             throw new InvalidParameterException("Chưa mua hàng nào");
         }
