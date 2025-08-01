@@ -72,7 +72,7 @@ public class OrderController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<Order> buyProducts(HttpSession session, request rq)
+    public ResponseEntity<Order> buyProducts(HttpSession session,@RequestBody request rq)
     {
         Order res = orderService.createOrder(session,rq);
         return ResponseEntity.ok(res);
