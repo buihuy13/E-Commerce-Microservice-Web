@@ -69,7 +69,7 @@ public class AuthService {
                 throw new InvalidParameters("Dữ liệu đầu vào không hợp lệ");
             }
             log.error("Error during registration: {}", e.getMessage(), e); 
-            throw new RuntimeException("Error during registration: " + e.getMessage(), e);
+            throw new RuntimeException("Error during registration: {}" + e.getMessage(), e);
         }
     }
 
