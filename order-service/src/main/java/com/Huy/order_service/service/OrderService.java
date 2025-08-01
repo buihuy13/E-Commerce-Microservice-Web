@@ -63,7 +63,7 @@ public class OrderService {
 
         if (cart == null) {
             cart = new ArrayList<CartItem>();
-            session.setAttribute(Cart_Key, cart);
+            session.setAttribute(Cart_Key + rq.getUserId(), cart);
         }
         return cart;
     }
@@ -94,7 +94,7 @@ public class OrderService {
                 list.remove(cartItemFound.get());
             }
             list.add(newReservation);
-            session.setAttribute(Cart_Key, list);
+            session.setAttribute(Cart_Key + id, list);
 
         } catch (WebClientResponseException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -113,7 +113,7 @@ public class OrderService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm trong giỏ hàng"));
         list.remove(cartModel);
-        session.setAttribute(Cart_Key, list);
+        session.setAttribute(Cart_Key + rq.getUserId(), list);
     }
 
     @Transactional
