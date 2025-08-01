@@ -193,12 +193,6 @@ services:
       - KAFKA_SERVER=broker:29092
     depends_on:
       - service-discovery
-  frontend:
-    build:
-      context: ./clothesWebsite
-      dockerfile: ./Dockerfile
-    ports:
-      - "3000:3000"
 
 volumes:
   mysql_data:

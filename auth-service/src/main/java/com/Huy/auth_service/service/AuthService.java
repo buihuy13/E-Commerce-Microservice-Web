@@ -36,7 +36,7 @@ public class AuthService {
     private final WebClient.Builder webClientBuilder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final kafkaTemplate kafkaTemplate;
+    private final KafkaTemplate kafkaTemplate;
 
     public AuthService(BCryptPasswordEncoder passwordEncoder, WebClient.Builder webClientBuilder,
                        AuthenticationManager authenticationManager, JwtService jwtService, KafkaTemplate kafkaTemplate) {
