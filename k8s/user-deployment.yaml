@@ -64,6 +64,16 @@ spec:
               configMapKeyRef:
                 name: user-config
                 key: PORT
+          - name: KAFKA_SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: user-config
+                key: KAFKA_SERVER
+          - name: URL
+            valueFrom:
+              configMapKeyRef:
+                name: auth-config
+                key: URL
 
 ---
 apiVersion: v1

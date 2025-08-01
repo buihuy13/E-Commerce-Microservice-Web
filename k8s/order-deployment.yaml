@@ -69,6 +69,16 @@ spec:
               configMapKeyRef:
                 name: order-config
                 key: KAFKA_SERVER
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: REDIS_HOST
+          - name: REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: REDIS_PORT
 
 ---
 apiVersion: v1

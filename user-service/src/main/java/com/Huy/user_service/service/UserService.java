@@ -3,6 +3,8 @@ package com.Huy.user_service.service;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.Huy.user_service.data.activation;
@@ -14,13 +16,20 @@ import com.Huy.user_service.util.Utils;
 
 import jakarta.transaction.Transactional;
 
+import com.Huy.Common.Event.ConfirmationEvent;
 import com.Huy.Common.Exception.ResourceNotFoundException;
 
 @Service
 public class UserService {
+
+    @Value("${URL}")
+    private String url;
+
     private final UserRepository userRepository;
-    public UserService(UserRepository userRepository) {
+    private final KafkaTemplate kafkaTemplate;
+    public UserService(UserRepository userRepository, KafkaTemplate kafkaTemplate) {
         this.userRepository = userRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }   
 
     public List<Users> getAllUsers() {
@@ -66,5 +75,15 @@ public class UserService {
             throw new SQLIntegrityConstraintViolationException("Account is already activated");
         }
         user.setActive(activation.ACTIVATE.toString());
+    }
+
+    public void sendVerificationEmail(String email) {
+        Users user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with email: " + email);
+        }
+        String verificationCode = user.getVerificationCode();
+        kafkaTemplate.send("confirmationTopic", new ConfirmationEvent(email, 
+                    url + "/api/users/confirm?code=" + verificationCode));
     }
 }

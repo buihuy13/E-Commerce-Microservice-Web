@@ -71,4 +71,10 @@ public class UserController {
         userService.acitvateAccount(code);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/email")
+    public ResponseEntity<Void> reSendVerificationEmail(@RequestParam String email) {
+        userService.sendVerificationEmail(email);
+        return ResponseEntity.ok().build();
+    }
 }

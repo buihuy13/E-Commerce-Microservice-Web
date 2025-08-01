@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import com.Huy.notification_service.model.ConfirmationBody;
-import com.Huy.notification_service.model.RequestBody;
+import com.Huy.Common.Event.ConfirmationEvent;
+import com.Huy.Common.Event.NotificationEvent;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -36,7 +36,7 @@ public class EmailService {
     private String username;
 
     @KafkaListener(topics = "notificationTopic")
-    public void sendEmail(RequestBody request) {
+    public void sendEmail(NotificationEvent request) {
         try {
             Context context = new Context();
             Map<String, Object> map = new HashMap<>();
@@ -60,7 +60,7 @@ public class EmailService {
     }
 
     @KafkaListener(topics = "confirmationTopic")
-    public void sendConfirmationEmail(ConfirmationBody request) {
+    public void sendConfirmationEmail(ConfirmationEvent request) {
         try {
             Context context = new Context();
             Map<String, Object> map = new HashMap<>();

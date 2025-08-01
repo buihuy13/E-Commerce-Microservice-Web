@@ -89,7 +89,7 @@ services:
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8081
-      - URL=http://auth-service:8081
+      - URL=http://user-service:8082
       - KAFKA_SERVER=broker:29092
     depends_on:
       - service-discovery
@@ -109,6 +109,8 @@ services:
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8082
+      - KAFKA_SERVER=broker:29092
+      - URL=http://user-service:8082
     depends_on:
       db:
         condition: service_healthy
@@ -168,10 +170,14 @@ services:
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8085
       - KAFKA_SERVER=broker:29092
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       db:
         condition: service_healthy
       service-discovery:
+        condition: service_started
+      redis:
         condition: service_started
   payment-service:
     build:
@@ -193,6 +199,11 @@ services:
       - KAFKA_SERVER=broker:29092
     depends_on:
       - service-discovery
+  redis:
+    image: "redis:7-alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
 
 volumes:
   mysql_data:

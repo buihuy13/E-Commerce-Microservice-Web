@@ -6,3 +6,5 @@ data:
   ZIPKIN_ENDPOINT: "http://zipkin-service:9411/api/v2/spans"
   EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
   PORT: "8082"
+  KAFKA_SERVER: "kafka-service:9092"
+  URL: "http://57.158.168.241/"
