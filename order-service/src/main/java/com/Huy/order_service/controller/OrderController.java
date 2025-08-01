@@ -26,7 +26,6 @@ import com.Huy.order_service.model.CartItem;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -43,12 +42,11 @@ public class OrderController {
     @TimeLimiter(name = "order_product")
     @Retry(name = "order_product")
     public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartItem cart,
-                                                                        HttpSession session, 
                                                                         @PathVariable String id) throws SQLIntegrityConstraintViolationException
     {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                orderService.addToCart(cart, session, id);
+                orderService.addToCart(cart, id);
                 return ResponseEntity.ok(new MessageResponse("Thêm thành công"));
             }
             catch(ResourceNotFoundException ex) {
@@ -66,23 +64,23 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, HttpSession session,@RequestBody request rq)
+    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, @RequestBody request rq)
     {
-        orderService.removeFromCart(session, id, rq);
+        orderService.removeFromCart(id, rq);
         return ResponseEntity.ok(new MessageResponse("Xóa thành công"));
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<Order> buyProducts(HttpSession session,@RequestBody request rq)
+    public ResponseEntity<Order> buyProducts(@RequestBody request rq)
     {
-        Order res = orderService.createOrder(session,rq);
+        Order res = orderService.createOrder(rq);
         return ResponseEntity.ok(res);
     }
 
     @GetMapping() 
-    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session,@RequestParam String userid)
+    public ResponseEntity<List<CartItem>> getAllItems(@RequestParam String userid)
     {
-        List<CartItem> cart = orderService.getCartFromSession(session, userid);
+        List<CartItem> cart = orderService.getCartFromRedis(userid);
         return ResponseEntity.ok(cart);
     }
 

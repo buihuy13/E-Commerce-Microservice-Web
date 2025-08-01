@@ -8,7 +8,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,7 +28,6 @@ import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.repository.OrderRepository;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,16 +37,21 @@ public class OrderService {
     private final WebClient.Builder webClientBuilder;
     private final OrderRepository orderRepository;
     private final KafkaTemplate kafkaTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public OrderService(WebClient.Builder webClientBuilder, OrderRepository orderRepository, KafkaTemplate kafkaTemplate) {
+    public OrderService(WebClient.Builder webClientBuilder, OrderRepository orderRepository, KafkaTemplate kafkaTemplate,
+                        RedisTemplate<String, Object> redisTemplate) {
         this.webClientBuilder = webClientBuilder;
         this.orderRepository = orderRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
-    private static final String Cart_Key = "CART";
-
     private final String CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+
+    private String getCartKey(String userId) {
+        return "CART" + userId;
+    }
 
     private String generateRandomId(int length) {
         SecureRandom random = new SecureRandom();
@@ -57,19 +63,17 @@ public class OrderService {
         return sb.toString();
     }
 
-    public List<CartItem> getCartFromSession(HttpSession session, String userId) {
+    public List<CartItem> getCartFromRedis(String userId) {
         @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute(Cart_Key + userId);
-
-        if (cart == null) {
+        List<CartItem> cart = (List<CartItem>) redisTemplate.opsForValue().get(getCartKey(userId));
+        if (cart == null || cart.isEmpty()) {
             cart = new ArrayList<CartItem>();
-            session.setAttribute(Cart_Key + userId, cart);
         }
         return cart;
     }
 
     // Còn trường hợp race condition chưa được xử lý
-    public void addToCart(CartItem cart, HttpSession session, String id) throws SQLIntegrityConstraintViolationException {
+    public void addToCart(CartItem cart, String id) throws SQLIntegrityConstraintViolationException {
         try {
             int productDetailsId = cart.getProductDetailsId();
             int quantity = cart.getQuantity();
@@ -84,7 +88,7 @@ public class OrderService {
                 throw new SQLIntegrityConstraintViolationException(
                         "Không còn đủ số lượng cho productId: " + productDetailsId);
             }
-            List<CartItem> list = getCartFromSession(session, id);
+            List<CartItem> list = getCartFromRedis(id);
             var cartItemFound = list.stream()
                     .filter(item -> item.getProductDetailsId() == productDetailsId)
                     .findFirst();
@@ -92,8 +96,7 @@ public class OrderService {
                 list.remove(cartItemFound.get());
             }
             list.add(cart);
-            System.out.println("Thêm vào giỏ hàng thành công: " + cart);
-            session.setAttribute(Cart_Key + id, list);
+            redisTemplate.opsForValue().set(getCartKey(id), list, 30, TimeUnit.MINUTES);
 
         } catch (WebClientResponseException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -106,18 +109,18 @@ public class OrderService {
     }
 
     // Xóa đặt chỗ khi người dùng tự xóa khỏi giỏ hàng.
-    public void removeFromCart(HttpSession session, int productId, request rq) {
-        List<CartItem> list = getCartFromSession(session, rq.getUserId());
+    public void removeFromCart(int productId, request rq) {
+        List<CartItem> list = getCartFromRedis(rq.getUserId());
         CartItem cartModel = list.stream().filter(p -> p.getProductDetailsId() == productId)
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm trong giỏ hàng"));
         list.remove(cartModel);
-        session.setAttribute(Cart_Key + rq.getUserId(), list);
+        redisTemplate.opsForValue().set(getCartKey(rq.getUserId()), list, 30, TimeUnit.MINUTES);
     }
 
     @Transactional
-    public Order createOrder(HttpSession session, request rq) {
-        List<CartItem> list = getCartFromSession(session, rq.getUserId());
+    public Order createOrder(request rq) {
+        List<CartItem> list = getCartFromRedis(rq.getUserId());
         if (list == null || list.size() == 0) {
             throw new InvalidParameterException("Chưa mua hàng nào");
         }
@@ -130,6 +133,7 @@ public class OrderService {
         orderRepository.save(order);
         orderRepository.flush(); // Đảm bảo order được lưu vào DB trước khi gửi sự kiện
         order.getProducts().forEach(cart -> cart.getId());
+        redisTemplate.delete(getCartKey(rq.getUserId()));
         return order;
     }
 
