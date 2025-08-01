@@ -69,7 +69,7 @@ public class OrderService {
     }
 
     // Còn trường hợp race condition chưa được xử lý
-    public void addToCart(CartModel cart, HttpSession session, String id) throws SQLIntegrityConstraintViolationException {
+    public void addToCart(CartItem cart, HttpSession session, String id) throws SQLIntegrityConstraintViolationException {
         try {
             int productDetailsId = cart.getProductDetailsId();
             int quantity = cart.getQuantity();
@@ -84,8 +84,6 @@ public class OrderService {
                 throw new SQLIntegrityConstraintViolationException(
                         "Không còn đủ số lượng cho productId: " + productDetailsId);
             }
-
-            CartItem newReservation = new CartItem(quantity, productDetailsId);
             List<CartItem> list = getCartFromSession(session, new request(id));
             var cartItemFound = list.stream()
                     .filter(item -> item.getProductDetailsId() == productDetailsId)
@@ -93,7 +91,8 @@ public class OrderService {
             if (cartItemFound.isPresent()) {
                 list.remove(cartItemFound.get());
             }
-            list.add(newReservation);
+            list.add(cart);
+            System.out.println("Thêm vào giỏ hàng thành công: " + cart);
             session.setAttribute(Cart_Key + id, list);
 
         } catch (WebClientResponseException e) {

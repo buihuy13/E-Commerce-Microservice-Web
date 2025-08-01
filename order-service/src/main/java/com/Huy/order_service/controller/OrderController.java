@@ -18,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.Huy.order_service.model.MessageResponse;
 import com.Huy.order_service.model.request;
-import com.Huy.order_service.model.entity.CartModel;
 import com.Huy.order_service.model.entity.Order;
 import com.Huy.order_service.service.OrderService;
 import com.Huy.order_service.model.CartItem;
@@ -42,7 +41,7 @@ public class OrderController {
     @CircuitBreaker(name = "order_product", fallbackMethod = "fallbackMethod")
     @TimeLimiter(name = "order_product")
     @Retry(name = "order_product")
-    public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartModel cart,
+    public CompletableFuture<ResponseEntity<MessageResponse>> addToCart(@RequestBody @Valid CartItem cart,
                                                                         HttpSession session, 
                                                                         @PathVariable String id) throws SQLIntegrityConstraintViolationException
     {
@@ -60,13 +59,13 @@ public class OrderController {
         });
     }
 
-    public CompletableFuture<String> fallbackMethod(CartModel cart, RuntimeException ex)
+    public CompletableFuture<String> fallbackMethod(CartItem cart, RuntimeException ex)
     {
         return CompletableFuture.supplyAsync(() -> "Oops! Something went wrong, please wait for 5 more minutes~");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, HttpSession session, request rq)
+    public ResponseEntity<MessageResponse> deleteToCart(@PathVariable int id, HttpSession session,@RequestBody request rq)
     {
         orderService.removeFromCart(session, id, rq);
         return ResponseEntity.ok(new MessageResponse("Xóa thành công"));
@@ -80,7 +79,7 @@ public class OrderController {
     }
 
     @GetMapping() 
-    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session, request rq)
+    public ResponseEntity<List<CartItem>> getAllItems(HttpSession session,@RequestBody request rq)
     {
         List<CartItem> cart = orderService.getCartFromSession(session, rq);
         return ResponseEntity.ok(cart);
