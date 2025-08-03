@@ -66,7 +66,7 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User deleted successfully"));
     }
 
-    @PutMapping("/confirm")
+    @GetMapping("/confirm")
     public ResponseEntity<Void> confirmUser(@RequestParam String code) throws SQLIntegrityConstraintViolationException {
         userService.acitvateAccount(code);
         return ResponseEntity.ok().build();

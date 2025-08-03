@@ -24,7 +24,7 @@ spec:
             cpu: "150m"
           limits:
             memory: "768Mi"
-            cpu: "500m"
+            cpu: "700m"
         image: quochuy1304acrregistry.azurecr.io/order-service:latest
         ports:
         - containerPort: 8085
@@ -79,6 +79,17 @@ spec:
               configMapKeyRef:
                 name: order-config
                 key: REDIS_PORT
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: order-config
+                key: REDIS_PASSWORD
+          - name: REDIS_SSL
+            valueFrom:
+              configMapKeyRef:
+                name: order-config
+                key: REDIS_SSL
+          
 
 ---
 apiVersion: v1

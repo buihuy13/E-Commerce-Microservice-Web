@@ -7,5 +7,6 @@ data:
   EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
   PORT: "8085"
   KAFKA_SERVER: "kafka-service:9092"
-  REDIS_HOST: "redis"
-  REDIS_PORT: "6379"
+  REDIS_HOST: "quochuy.redis.cache.windows.net"
+  REDIS_PORT: "6380"
+  REDIS_SSL: "true"

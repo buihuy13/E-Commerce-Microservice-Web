@@ -24,6 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class EmailService {
+
+    @Value("${URL}")
+    private String url;
+
     private final SpringTemplateEngine springTemplateEngine;
     private final JavaMailSender javaMailSender;
 
@@ -65,7 +69,7 @@ public class EmailService {
             Context context = new Context();
             Map<String, Object> map = new HashMap<>();
             map.put("name", request.getEmail());
-            map.put("url", request.getUrl());
+            map.put("url", url+request.getUrl());
             context.setVariables(map);
             String process = springTemplateEngine.process("confirmation", context);
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();

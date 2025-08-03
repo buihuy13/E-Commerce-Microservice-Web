@@ -39,6 +39,19 @@ create table cart(
  `order_id` varchar(255) references `order`(id)
 );
 
+DELIMITER $$
+CREATE EVENT auto_remove_pending_orders
+ON SCHEDULE EVERY 5 MINUTE
+DO
+BEGIN
+    DELETE FROM `order` 
+    WHERE status = 'PENDING' 
+    AND created_at <= DATE_SUB(NOW(), INTERVAL 15 MINUTE);
+END$$
+DELIMITER ;
+
+SET GLOBAL event_scheduler = ON;
+
 create database if not exists `product-service`;
 use `product-service`;
 

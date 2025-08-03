@@ -21,10 +21,10 @@ spec:
         resources:
           requests:
             memory: "128Mi"
-            cpu: "100m"
+            cpu: "300m"
           limits:
             memory: "256Mi"
-            cpu: "250m"
+            cpu: "650m"
         image: quochuy1304acrregistry.azurecr.io/notification-service:latest
         ports:
         - containerPort: 8083
@@ -49,6 +49,11 @@ spec:
               configMapKeyRef:
                 name: notification-config
                 key: KAFKA_SERVER
+          - name: URL
+            valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: URL
 
 ---
 apiVersion: v1

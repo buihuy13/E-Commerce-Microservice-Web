@@ -1,6 +1,5 @@
 package com.Huy.auth_service.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,10 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthService {
-    
-    @Value("${URL}")
-    private String url;
-
     private final BCryptPasswordEncoder passwordEncoder;
     private final WebClient.Builder webClientBuilder;
     private final AuthenticationManager authenticationManager;
@@ -59,7 +54,7 @@ public class AuthService {
                                                         .block();
 
             kafkaTemplate.send("confirmationTopic", new ConfirmationEvent(registerDTO.getEmail(), 
-                    url + "/api/users/confirm?code=" + verificationCode));
+                                        "api/users/confirm?code=" + verificationCode));
         }
         catch(WebClientResponseException e)
         {

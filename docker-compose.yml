@@ -89,7 +89,6 @@ services:
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8081
-      - URL=http://user-service:8082
       - KAFKA_SERVER=broker:29092
     depends_on:
       - service-discovery
@@ -110,7 +109,6 @@ services:
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8082
       - KAFKA_SERVER=broker:29092
-      - URL=http://user-service:8082
     depends_on:
       db:
         condition: service_healthy
@@ -129,6 +127,7 @@ services:
       - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
       - PORT=8083
       - KAFKA_SERVER=broker:29092
+      - URL=http://user-service:8082
     depends_on:
       - service-discovery
   product-service:

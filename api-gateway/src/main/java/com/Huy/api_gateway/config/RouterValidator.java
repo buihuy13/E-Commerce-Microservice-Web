@@ -17,7 +17,8 @@ public class RouterValidator {
         "/eureka/web",
         "api/users/confirm",
         "/api/payment/vnpay-return",
-        "/api/payment/vnpay-ipn"
+        "/api/payment/vnpay-ipn",
+        "api/users/email"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

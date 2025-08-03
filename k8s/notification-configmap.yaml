@@ -7,3 +7,4 @@ data:
   EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
   PORT: "8083"
   KAFKA_SERVER: "kafka-service:9092"
+  URL: "http://huy-server.duckdns.org/"

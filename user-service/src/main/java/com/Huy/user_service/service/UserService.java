@@ -3,7 +3,6 @@ package com.Huy.user_service.service;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,6 @@ import com.Huy.Common.Exception.ResourceNotFoundException;
 
 @Service
 public class UserService {
-
-    @Value("${URL}")
-    private String url;
-
     private final UserRepository userRepository;
     private final KafkaTemplate kafkaTemplate;
     public UserService(UserRepository userRepository, KafkaTemplate kafkaTemplate) {
@@ -75,6 +70,7 @@ public class UserService {
             throw new SQLIntegrityConstraintViolationException("Account is already activated");
         }
         user.setActive(activation.ACTIVATE.toString());
+        userRepository.save(user);
     }
 
     public void sendVerificationEmail(String email) {
@@ -83,7 +79,6 @@ public class UserService {
             throw new ResourceNotFoundException("User not found with email: " + email);
         }
         String verificationCode = user.getVerificationCode();
-        kafkaTemplate.send("confirmationTopic", new ConfirmationEvent(email, 
-                    url + "/api/users/confirm?code=" + verificationCode));
+        kafkaTemplate.send("confirmationTopic", new ConfirmationEvent(email, "api/users/confirm?code=" + verificationCode));
     }
 }

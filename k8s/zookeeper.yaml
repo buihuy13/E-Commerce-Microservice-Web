@@ -20,11 +20,11 @@ spec:
       - name: zookeeper
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "50m"
+            memory: "120Mi"
+            cpu: "25m"
           limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "200Mi"
+            cpu: "100m"
         image: confluentinc/cp-zookeeper:7.3.2
         ports:
         - containerPort: 2181

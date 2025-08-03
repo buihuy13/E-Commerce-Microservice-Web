@@ -75,7 +75,7 @@ spring:
           uri: lb://user-service
           predicates:
           - Path=/api/users/**
-          - Method=Post, PUT, DELETE
+          - Method=POST, PUT, DELETE
           filters:
           - name: JwtAuthentication
             args:
