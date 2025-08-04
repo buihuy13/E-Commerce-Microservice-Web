@@ -82,7 +82,7 @@ spec:
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: order-config
+                name: order-secret
                 key: REDIS_PASSWORD
           - name: REDIS_SSL
             valueFrom:
