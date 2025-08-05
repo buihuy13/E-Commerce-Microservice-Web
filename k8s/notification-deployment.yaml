@@ -21,10 +21,10 @@ spec:
         resources:
           requests:
             memory: "128Mi"
-            cpu: "300m"
+            cpu: "500m"
           limits:
             memory: "256Mi"
-            cpu: "650m"
+            cpu: "900m"
         image: quochuy1304acrregistry.azurecr.io/notification-service:latest
         ports:
         - containerPort: 8083

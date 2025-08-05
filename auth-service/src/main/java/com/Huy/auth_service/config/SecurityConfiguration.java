@@ -1,7 +1,6 @@
 package com.Huy.auth_service.config;
 
 
-import org.springframework.boot.autoconfigure.ssl.SslBundleProperties.Options;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

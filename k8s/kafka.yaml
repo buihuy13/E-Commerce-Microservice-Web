@@ -20,11 +20,11 @@ spec:
       - name: kafka
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "900m"
-          limits:
-            memory: "700Mi"
+            memory: "800Mi"
             cpu: "1200m"
+          limits:
+            memory: "1500Mi"
+            cpu: "1600m"
         image: confluentinc/cp-kafka:7.3.2
         ports:
         - containerPort: 9092
